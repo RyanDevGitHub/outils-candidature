@@ -1,0 +1,217 @@
+:root {
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: #1f2937;
+  background-color: #f3f4f6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.container {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  gap: 1rem;
+  padding: 2rem 1rem;
+}
+
+.card {
+  width: min(680px, 100%);
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+  padding: 1.5rem;
+}
+
+.preview {
+  border: 1px solid #e5e7eb;
+}
+
+.preview-content {
+  margin: 0;
+  padding: 0.8rem;
+  border-radius: 8px;
+  background: #111827;
+  color: #e5e7eb;
+  font-size: 0.88rem;
+  overflow: auto;
+}
+
+h1,
+h2 {
+  margin: 0 0 0.25rem;
+}
+
+.subtitle {
+  margin-top: 0;
+  color: #4b5563;
+}
+
+form {
+  display: grid;
+  gap: 1rem;
+}
+
+fieldset {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+legend {
+  font-weight: 700;
+  padding: 0 0.4rem;
+}
+
+label {
+  font-weight: 600;
+  font-size: 0.94rem;
+}
+
+input,
+select,
+button {
+  font: inherit;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.6rem 0.7rem;
+}
+
+input:focus,
+select:focus,
+button:focus,
+a:focus {
+  outline: 2px solid #6366f1;
+  outline-offset: 1px;
+}
+
+button {
+  border: 0;
+  background: #4f46e5;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #4338ca;
+}
+
+.account-options {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.login-link {
+  color: #4f46e5;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-link:hover {
+  text-decoration: underline;
+}
+
+.social-button {
+  background: #111827;
+}
+
+.social-button:hover {
+  background: #030712;
+}
+
+.message {
+  min-height: 1.2rem;
+  font-weight: 600;
+  margin-top: 0.8rem;
+}
+
+.success {
+  color: #15803d;
+}
+
+.error {
+  color: #b91c1c;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(17, 24, 39, 0.55);
+}
+
+.hidden {
+  display: none;
+}
+
+.modal-card {
+  width: min(560px, 100%);
+  background: #fff;
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  display: grid;
+  gap: 1rem;
+}
+
+.progress-header {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.progress-text {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.progress-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.progress-bar {
+  width: 0;
+  height: 100%;
+  background: #4f46e5;
+  transition: width 200ms ease;
+}
+
+.modal-question {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.modal-field-container {
+  display: grid;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+.secondary {
+  background: #6b7280;
+}
+
+.secondary:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
