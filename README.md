@@ -14,6 +14,11 @@ Roadmap validée :
 2. PR SQLite (fichier DB + structure SQL).
 3. PR backend PHP (création compte + continuation avec réseaux sociaux).
 
+Interface web pour :
+- créer un compte avec un formulaire court (nom, email, mot de passe),
+- collecter ensuite les préférences de recherche d'emploi via une pop-up pas à pas,
+- afficher un aperçu du résultat final sauvegardé.
+
 ## Lancer localement
 
 ```bash

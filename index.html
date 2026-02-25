@@ -49,6 +49,33 @@
         <p class="switch-auth">
           Vous avez déjà un compte ? <a href="#" class="login-link">Se connecter</a>
         </p>
+      <section class="card">
+        <h1>Créer un compte</h1>
+        <p class="subtitle">
+          Commencez avec les informations essentielles. Nous compléterons ensuite votre profil en quelques étapes.
+        </p>
+
+        <form id="signup-form" novalidate>
+          <fieldset>
+            <legend>Informations de compte</legend>
+
+            <label for="fullName">Nom complet</label>
+            <input id="fullName" name="fullName" type="text" required />
+
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" required />
+
+            <label for="password">Mot de passe</label>
+            <input id="password" name="password" type="password" minlength="8" required />
+          </fieldset>
+
+          <button type="submit">Créer mon compte</button>
+        </form>
+
+        <div class="account-options" aria-label="Autres options de connexion">
+          <a href="#" class="login-link">Déjà un compte ? Se connecter</a>
+          <button type="button" class="social-button">Se connecter avec un réseau social</button>
+        </div>
 
         <p id="message" class="message" aria-live="polite"></p>
       </section>
