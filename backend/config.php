@@ -17,7 +17,7 @@ function appConfig(): array
     $root = dirname(__DIR__);
 
     return [
-        'app_env' => env('APP_ENV', 'local'),
+        'app_env' => env('APP_ENV', 'productions'),
         'db_path' => env('SQLITE_DB_PATH', $root . '/db/app.sqlite'),
         'frontend_url' => env('FRONTEND_URL', 'http://127.0.0.1:8000/index.html'),
         'mail_from' => env('MAIL_FROM', 'no-reply@outils-candidature.local'),

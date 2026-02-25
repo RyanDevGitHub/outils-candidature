@@ -291,18 +291,32 @@ if ($action === 'oauth.google.callback' && $method === 'GET') {
     $user = $stmt->fetch();
 
     if (!$user) {
-        $insert = $pdo->prepare('INSERT INTO users (full_name, email, password_hash, auth_provider, provider_user_id, email_verified_at) VALUES (:full_name, :email, :password_hash, :auth_provider, :provider_user_id, datetime("now"))');
-        $insert->execute([
-            'full_name' => $name,
-            'email' => mb_strtolower($email),
-            'password_hash' => null,
-            'auth_provider' => 'google',
-            'provider_user_id' => $googleId,
-        ]);
-        $id = (int) $pdo->lastInsertId();
-        $stmt = $pdo->prepare('SELECT * FROM users WHERE id = :id LIMIT 1');
-        $stmt->execute(['id' => $id]);
-        $user = $stmt->fetch();
+        $checkEmail = $pdo->prepare('SELECT id FROM users WHERE email = :email');
+        $checkEmail->execute(['email' => $email]); // Assure-toi que $email contient bien l'adresse reçue de Google
+        $existingUser = $checkEmail->fetch();
+
+        if ($existingUser) {
+            $update = $pdo->prepare('UPDATE users SET auth_provider = :auth_provider, provider_user_id = :provider_user_id, email_verified_at = datetime("now") WHERE id = :id');
+            $update->execute([
+                'auth_provider'    => 'google',
+                'provider_user_id' => $provider_user_id, // Variable reçue de Google
+                'id'               => $existingUser['id']
+            ]);
+        
+            $stmt->execute(['auth_provider' => 'google', 'provider_user_id' => $provider_user_id]);
+            $user = $stmt->fetch();
+            
+        } else {
+            $insert = $pdo->prepare('INSERT INTO users (full_name, email, password_hash, auth_provider, provider_user_id, email_verified_at) VALUES (:full_name, :email, :password_hash, :auth_provider, :provider_user_id, datetime("now"))');
+            $insert->execute([
+                'full_name'        => $full_name,
+                'email'            => $email,
+                'password_hash'    => null,
+                'auth_provider'    => 'google',
+                'provider_user_id' => $provider_user_id
+            ]);
+            $user = ['id' => $pdo->lastInsertId(), 'email' => $email];
+        }
     }
 
     $token = createAuthToken((int) $user['id']);

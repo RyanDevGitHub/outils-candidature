@@ -194,6 +194,7 @@ function handleOauthTokenFromHash() {
   saveAuthToken(authToken);
   setMessage('Connexion Google réussie. Vous pouvez compléter votre profil.', 'success');
   history.replaceState(null, '', window.location.pathname);
+  openModal();
 }
 
 signupForm.addEventListener('submit', async (event) => {
