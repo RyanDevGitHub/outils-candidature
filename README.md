@@ -7,25 +7,41 @@ Prototype front (HTML/CSS/JS) pour :
 
 ## État actuel
 
-Cette version est **UI only** (pas de backend ni base de données intégrée dans cette PR).
+Cette version est **UI only** (pas de backend applicatif encore branché dans cette PR).
 
 Roadmap validée :
-1. PR UI (celle-ci).
-2. PR SQLite (fichier DB + structure SQL).
+1. PR UI.
+2. PR SQLite (celle-ci: structure de base pour `User`).
 3. PR backend PHP (création compte + continuation avec réseaux sociaux).
 
-Interface web pour :
-- créer un compte avec un formulaire court (nom, email, mot de passe),
-- collecter ensuite les préférences de recherche d'emploi via une pop-up pas à pas,
-- afficher un aperçu du résultat final sauvegardé.
-
-## Lancer localement
+## Lancer localement (front)
 
 ```bash
 python3 -m http.server 4173
 ```
 
 Puis ouvrir <http://localhost:4173>.
+
+## Initialiser la base SQLite
+
+Cette PR ajoute une base SQLite pour l'entité `users`.
+
+```bash
+php scripts/init_db.php
+```
+
+Cela crée `db/app.sqlite` et applique `db/schema.sql`.
+
+## Modèle actuel: User
+
+Table `users`:
+- `id` (PK autoincrémentée)
+- `full_name`
+- `email` (unique)
+- `password_hash` (obligatoire pour `auth_provider = email`)
+- `auth_provider` (`email`, `google`, `github`, `apple`)
+- `provider_user_id` (identifiant social)
+- `created_at`, `updated_at`
 
 ## Parcours utilisateur
 
