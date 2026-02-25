@@ -1,4 +1,9 @@
+const API_BASE = '/public/api.php';
+const AUTH_TOKEN_KEY = 'authToken';
+
 const signupForm = document.getElementById('signup-form');
+const verifyForm = document.getElementById('verify-form');
+const googleOauthButton = document.getElementById('google-oauth-button');
 const message = document.getElementById('message');
 const modal = document.getElementById('profile-modal');
 const modalQuestion = document.getElementById('modal-question');
@@ -11,58 +16,50 @@ const profilePreview = document.getElementById('profile-preview');
 const previewContent = document.getElementById('preview-content');
 
 const profileSteps = [
-  {
-    key: 'contractType',
-    label: 'Quel type de contrat recherchez-vous ?',
-    type: 'select',
-    options: ['CDI', 'CDD', 'Stage', 'Alternance', 'Freelance'],
-  },
-  {
-    key: 'regions',
-    label: 'Dans quelles régions souhaitez-vous travailler ? (séparez par des virgules)',
-    type: 'text',
-    placeholder: 'Île-de-France, Occitanie',
-  },
-  {
-    key: 'educationLevel',
-    label: "Quel est votre niveau d'étude ?",
-    type: 'select',
-    options: ['Bac', 'Bac+2', 'Bac+3', 'Bac+5', 'Doctorat'],
-  },
-  {
-    key: 'duration',
-    label: 'Quelle durée souhaitez-vous ?',
-    type: 'text',
-    placeholder: 'Ex: 6 mois',
-  },
-  {
-    key: 'experience',
-    label: "Quel est votre niveau d'expérience ?",
-    type: 'select',
-    options: ['Junior (0-2 ans)', 'Confirmé (3-5 ans)', 'Senior (6+ ans)'],
-  },
-  {
-    key: 'startDate',
-    label: 'Quelle est votre date de début souhaitée ?',
-    type: 'date',
-  },
-  {
-    key: 'companyCategory',
-    label: "Quelle catégorie d'entreprise vous intéresse ?",
-    type: 'select',
-    options: ['Startup', 'PME', 'Grande entreprise', 'Association', 'Public'],
-  },
+  { key: 'contractType', label: 'Quel type de contrat recherchez-vous ?', type: 'select', options: ['CDI', 'CDD', 'Stage', 'Alternance', 'Freelance'] },
+  { key: 'regions', label: 'Dans quelles régions souhaitez-vous travailler ? (séparez par des virgules)', type: 'text', placeholder: 'Île-de-France, Occitanie' },
+  { key: 'educationLevel', label: "Quel est votre niveau d'étude ?", type: 'select', options: ['Bac', 'Bac+2', 'Bac+3', 'Bac+5', 'Doctorat'] },
+  { key: 'duration', label: 'Quelle durée souhaitez-vous ?', type: 'text', placeholder: 'Ex: 6 mois' },
+  { key: 'experience', label: "Quel est votre niveau d'expérience ?", type: 'select', options: ['Junior (0-2 ans)', 'Confirmé (3-5 ans)', 'Senior (6+ ans)'] },
+  { key: 'startDate', label: 'Quelle est votre date de début souhaitée ?', type: 'date' },
+  { key: 'companyCategory', label: "Quelle catégorie d'entreprise vous intéresse ?", type: 'select', options: ['Startup', 'PME', 'Grande entreprise', 'Association', 'Public'] },
 ];
 
 let currentStep = 0;
 let accountData = null;
+let pendingEmail = '';
 const profileAnswers = {};
 
 function parseRegions(value) {
-  return value
-    .split(',')
-    .map((region) => region.trim())
-    .filter(Boolean);
+  return value.split(',').map((region) => region.trim()).filter(Boolean);
+}
+
+function setMessage(text, type = 'success') {
+  message.textContent = text;
+  message.className = `message ${type}`;
+}
+
+async function apiRequest(action, payload) {
+  const response = await fetch(`${API_BASE}?action=${encodeURIComponent(action)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+  if (!response.ok || !data.ok) {
+    throw new Error(data.error || 'Une erreur est survenue.');
+  }
+
+  return data;
+}
+
+function saveAuthToken(token) {
+  localStorage.setItem(AUTH_TOKEN_KEY, token);
+}
+
+function getAuthToken() {
+  return localStorage.getItem(AUTH_TOKEN_KEY) || '';
 }
 
 function renderPreview(payload) {
@@ -72,13 +69,10 @@ function renderPreview(payload) {
 
 function hydratePreviewFromStorage() {
   const raw = localStorage.getItem('candidateProfile');
-  if (!raw) {
-    return;
-  }
+  if (!raw) return;
 
   try {
-    const parsed = JSON.parse(raw);
-    renderPreview(parsed);
+    renderPreview(JSON.parse(raw));
   } catch {
     localStorage.removeItem('candidateProfile');
   }
@@ -95,18 +89,13 @@ function getStepValue(step) {
 function setStepValue(step, rawValue) {
   if (step.key === 'regions') {
     const parsed = parseRegions(rawValue);
-    if (!parsed.length) {
-      return false;
-    }
+    if (!parsed.length) return false;
     profileAnswers.regions = parsed;
     return true;
   }
 
   const value = rawValue.trim();
-  if (!value) {
-    return false;
-  }
-
+  if (!value) return false;
   profileAnswers[step.key] = value;
   return true;
 }
@@ -138,9 +127,7 @@ function renderStep() {
   } else {
     input = document.createElement('input');
     input.type = step.type;
-    if (step.placeholder) {
-      input.placeholder = step.placeholder;
-    }
+    if (step.placeholder) input.placeholder = step.placeholder;
   }
 
   input.id = 'step-input';
@@ -185,33 +172,89 @@ function saveProfile() {
   return payload;
 }
 
-signupForm.addEventListener('submit', (event) => {
+async function restoreSessionIfAny() {
+  const token = getAuthToken();
+  if (!token) return;
+
+  try {
+    const data = await apiRequest('auth.session', { token });
+    accountData = { fullName: data.user.fullName || '', email: data.user.email };
+    setMessage(`Session active: ${data.user.email}`, 'success');
+  } catch {
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+  }
+}
+
+function handleOauthTokenFromHash() {
+  const hash = window.location.hash.replace(/^#/, '');
+  const params = new URLSearchParams(hash);
+  const authToken = params.get('authToken');
+  if (!authToken) return;
+
+  saveAuthToken(authToken);
+  setMessage('Connexion Google réussie. Vous pouvez compléter votre profil.', 'success');
+  history.replaceState(null, '', window.location.pathname);
+  openModal();
+}
+
+signupForm.addEventListener('submit', async (event) => {
   event.preventDefault();
 
   if (!signupForm.checkValidity()) {
-    message.textContent = 'Merci de renseigner tous les champs obligatoires.';
-    message.className = 'message error';
+    setMessage('Merci de renseigner tous les champs obligatoires.', 'error');
     signupForm.reportValidity();
     return;
   }
 
-  accountData = {
-    fullName: signupForm.fullName.value.trim(),
-    email: signupForm.email.value.trim(),
-  };
+  const fullName = signupForm.fullName.value.trim();
+  const email = signupForm.email.value.trim();
 
-  message.textContent = 'Compte créé. Complétez maintenant votre profil étape par étape.';
-  message.className = 'message success';
-
-  signupForm.reset();
-  openModal();
+  try {
+    const data = await apiRequest('auth.email.start', { fullName, email });
+    pendingEmail = email;
+    accountData = { fullName, email };
+    verifyForm.classList.remove('hidden');
+    setMessage(
+      data.debugCode
+        ? `Code envoyé. (dev: ${data.debugCode})`
+        : 'Code envoyé par e-mail. Vérifiez votre boîte de réception.',
+      'success'
+    );
+  } catch (error) {
+    setMessage(error.message, 'error');
+  }
 });
 
-backButton.addEventListener('click', () => {
-  if (currentStep === 0) {
+verifyForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  if (!verifyForm.checkValidity()) {
+    verifyForm.reportValidity();
+    setMessage('Code de vérification invalide.', 'error');
     return;
   }
 
+  const code = verifyForm.verificationCode.value.trim();
+
+  try {
+    const data = await apiRequest('auth.email.verify', { email: pendingEmail, code });
+    saveAuthToken(data.token);
+    accountData = { fullName: data.user.fullName || '', email: data.user.email };
+    verifyForm.reset();
+    verifyForm.classList.add('hidden');
+    setMessage('E-mail vérifié. Vous êtes connecté.', 'success');
+    openModal();
+  } catch (error) {
+    setMessage(error.message, 'error');
+  }
+});
+
+googleOauthButton.addEventListener('click', () => {
+  window.location.href = `${API_BASE}?action=oauth.google.start`;
+});
+
+backButton.addEventListener('click', () => {
+  if (currentStep === 0) return;
   currentStep -= 1;
   renderStep();
 });
@@ -221,8 +264,7 @@ nextButton.addEventListener('click', () => {
   const input = document.getElementById('step-input');
 
   if (!setStepValue(step, input.value)) {
-    message.textContent = 'Merci de répondre à la question avant de continuer.';
-    message.className = 'message error';
+    setMessage('Merci de répondre à la question avant de continuer.', 'error');
     input.focus();
     return;
   }
@@ -238,9 +280,9 @@ nextButton.addEventListener('click', () => {
   const payload = saveProfile();
   renderPreview(payload);
   closeModal();
-
-  message.textContent = 'Profil complété avec succès. Vos préférences ont été enregistrées.';
-  message.className = 'message success';
+  setMessage('Profil complété avec succès. Vos préférences ont été enregistrées.', 'success');
 });
 
+handleOauthTokenFromHash();
 hydratePreviewFromStorage();
+restoreSessionIfAny();
