@@ -82,6 +82,7 @@ function getStepValue(step) {
   if (step.key === 'regions') {
     return Array.isArray(profileAnswers.regions) ? profileAnswers.regions.join(', ') : '';
   }
+
   return profileAnswers[step.key] || '';
 }
 
@@ -105,6 +106,7 @@ function renderStep() {
 
   progressText.textContent = `Finalisation du profil : ${progress}%`;
   progressBar.style.width = `${progress}%`;
+
   modalQuestion.textContent = step.label;
   modalFieldContainer.innerHTML = '';
 
