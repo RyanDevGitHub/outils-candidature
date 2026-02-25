@@ -1,59 +1,5 @@
 <!doctype html>
 <html lang="fr">
-<<<<<<< codex/add-account-creation-with-job-search-options
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Outil candidature - Création de compte</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <main class="container">
-      <section class="card auth-card">
-        <h1>Créer un compte</h1>
-        <p class="subtitle">
-          Version UI uniquement (HTML/CSS/JS). Le backend PHP + SQLite sera traité dans une prochaine PR.
-        </p>
-
-        <div class="social-stack" aria-label="Connexion avec un réseau social">
-          <button type="button" class="social-button social-google">
-            <span class="icon" aria-hidden="true">G</span>
-            Continuer avec Google
-          </button>
-          <button type="button" class="social-button social-github">
-            <span class="icon" aria-hidden="true">◉</span>
-            Continuer avec GitHub
-          </button>
-          <button type="button" class="social-button social-apple">
-            <span class="icon" aria-hidden="true"></span>
-            Continuer avec Apple
-          </button>
-        </div>
-
-        <form id="signup-form" novalidate>
-          <fieldset>
-            <legend>Inscription par e-mail</legend>
-
-            <label for="fullName">Nom complet</label>
-            <input id="fullName" name="fullName" type="text" placeholder="Votre nom complet" required />
-
-            <label for="email">E-mail</label>
-            <input id="email" name="email" type="email" placeholder="Votre adresse e-mail" required />
-
-            <label for="password">Mot de passe</label>
-            <input id="password" name="password" type="password" minlength="8" placeholder="Minimum 8 caractères" required />
-          </fieldset>
-
-          <button type="submit" class="primary-cta">Continuer</button>
-        </form>
-
-        <p class="switch-auth">
-          Vous avez déjà un compte ? <a href="#" class="login-link">Se connecter</a>
-        </p>
-
-        <p id="message" class="message" aria-live="polite"></p>
-      </section>
-=======
 
 <head>
   <meta charset="UTF-8" />
@@ -99,41 +45,12 @@
         Vous avez déjà un compte ? <a href="#" class="login-link">Se connecter</a>
       </p>
 
->>>>>>> main
 
       <section id="profile-preview" class="card preview hidden" aria-live="polite">
         <h2>Résultat possible : aperçu du profil enregistré</h2>
         <p class="subtitle">Voici ce qui est sauvegardé une fois le profil complété.</p>
         <pre id="preview-content" class="preview-content"></pre>
       </section>
-<<<<<<< codex/add-account-creation-with-job-search-options
-    </main>
-
-    <section id="profile-modal" class="modal hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-      <div class="modal-card">
-        <div class="progress-header">
-          <p id="progress-text" class="progress-text">Finalisation du profil : 0%</p>
-          <div class="progress-track" aria-hidden="true">
-            <div id="progress-bar" class="progress-bar"></div>
-          </div>
-        </div>
-
-        <h2 id="modal-title">Compléter votre profil</h2>
-        <p id="modal-question" class="modal-question"></p>
-
-        <div id="modal-field-container" class="modal-field-container"></div>
-
-        <div class="modal-actions">
-          <button id="back-button" type="button" class="secondary">Retour</button>
-          <button id="next-button" type="button">Suivant</button>
-        </div>
-      </div>
-    </section>
-
-    <script src="app.js"></script>
-  </body>
-</html>
-=======
   </main>
 
   <section id="profile-modal" class="modal hidden" aria-hidden="true" role="dialog" aria-modal="true"
@@ -162,4 +79,3 @@
 </body>
 
 </html>
->>>>>>> main
