@@ -1,5 +1,19 @@
 # Outil candidature
 
+Prototype front (HTML/CSS/JS) pour :
+- créer un compte avec un formulaire court,
+- collecter ensuite les préférences de recherche d'emploi via une pop-up pas à pas,
+- afficher un aperçu du résultat final sauvegardé.
+
+## État actuel
+
+Cette version est **UI only** (pas de backend ni base de données intégrée dans cette PR).
+
+Roadmap validée :
+1. PR UI (celle-ci).
+2. PR SQLite (fichier DB + structure SQL).
+3. PR backend PHP (création compte + continuation avec réseaux sociaux).
+
 Interface web pour :
 - créer un compte avec un formulaire court (nom, email, mot de passe),
 - collecter ensuite les préférences de recherche d'emploi via une pop-up pas à pas,

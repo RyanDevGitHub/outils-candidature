@@ -8,6 +8,47 @@
   </head>
   <body>
     <main class="container">
+      <section class="card auth-card">
+        <h1>Créer un compte</h1>
+        <p class="subtitle">
+          Version UI uniquement (HTML/CSS/JS). Le backend PHP + SQLite sera traité dans une prochaine PR.
+        </p>
+
+        <div class="social-stack" aria-label="Connexion avec un réseau social">
+          <button type="button" class="social-button social-google">
+            <span class="icon" aria-hidden="true">G</span>
+            Continuer avec Google
+          </button>
+          <button type="button" class="social-button social-github">
+            <span class="icon" aria-hidden="true">◉</span>
+            Continuer avec GitHub
+          </button>
+          <button type="button" class="social-button social-apple">
+            <span class="icon" aria-hidden="true"></span>
+            Continuer avec Apple
+          </button>
+        </div>
+
+        <form id="signup-form" novalidate>
+          <fieldset>
+            <legend>Inscription par e-mail</legend>
+
+            <label for="fullName">Nom complet</label>
+            <input id="fullName" name="fullName" type="text" placeholder="Votre nom complet" required />
+
+            <label for="email">E-mail</label>
+            <input id="email" name="email" type="email" placeholder="Votre adresse e-mail" required />
+
+            <label for="password">Mot de passe</label>
+            <input id="password" name="password" type="password" minlength="8" placeholder="Minimum 8 caractères" required />
+          </fieldset>
+
+          <button type="submit" class="primary-cta">Continuer</button>
+        </form>
+
+        <p class="switch-auth">
+          Vous avez déjà un compte ? <a href="#" class="login-link">Se connecter</a>
+        </p>
       <section class="card">
         <h1>Créer un compte</h1>
         <p class="subtitle">
