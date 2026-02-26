@@ -12,7 +12,7 @@ const homeMessage = document.getElementById('home-message');
 
 const profileSteps = [
   { key: 'contractType', label: 'Quel type de contrat recherchez-vous ?', type: 'select', options: ['CDI', 'CDD', 'Stage', 'Alternance', 'Freelance'] },
-  { key: 'regions', label: 'Dans quelles régions souhaitez-vous travailler ? (séparez par des virgules)', type: 'autocomplete', placeholder: 'Île-de-France, Occitanie' },
+  { key: 'regions', label: 'Dans quelles régions souhaitez-vous travailler ?', type: 'region-select' },
   { key: 'educationLevel', label: "Quel est votre niveau d'étude ?", type: 'select', options: ['Bac', 'Bac+2', 'Bac+3', 'Bac+5', 'Doctorat'] },
   { key: 'duration', label: 'Quelle durée souhaitez-vous ?', type: 'select', options: ['3 mois', '6 mois', '1 an', '18 mois', '2 ans', '3 ans'] },
   { key: 'experience', label: "Quel est votre niveau d'expérience ?", type: 'select', options: ['Junior (0-2 ans)', 'Confirmé (3-5 ans)', 'Senior (6+ ans)'] },
@@ -26,8 +26,9 @@ let accountData = null;
 let currentStep = 0;
 const profileAnswers = {};
 
-function parseRegions(value) {
-  return value.split(',').map((region) => region.trim()).filter(Boolean);
+function toggleModal(visible) {
+  modal.classList.toggle('hidden', !visible);
+  modal.setAttribute('aria-hidden', visible ? 'false' : 'true');
 }
 
 function setMessage(text, type = 'success') {
@@ -72,7 +73,7 @@ function getStepValue(step) {
 
 function setStepValue(step, rawValue) {
   if (step.key === 'regions') {
-    const parsed = parseRegions(rawValue);
+    const parsed = Array.isArray(rawValue) ? rawValue : [];
     if (!parsed.length) return false;
     profileAnswers.regions = parsed;
     return true;
@@ -160,24 +161,27 @@ function renderStep() {
 
     input.id = 'step-input';
     input.value = getStepValue(step);
+  } else if (step.key === 'regions') {
+    input = document.createElement('select');
+    input.id = 'step-input';
+    input.className = 'region-select';
+    input.multiple = true;
+
+    REGION_SUGGESTIONS.forEach((region) => {
+      const option = document.createElement('option');
+      option.value = region;
+      option.textContent = region;
+      if ((profileAnswers.regions || []).includes(region)) {
+        option.selected = true;
+      }
+      input.appendChild(option);
+    });
   } else {
     input = document.createElement('input');
     input.type = 'text';
     input.id = 'step-input';
     input.value = getStepValue(step);
     if (step.placeholder) input.placeholder = step.placeholder;
-
-    if (step.key === 'regions') {
-      input.setAttribute('list', 'regions-suggestions');
-      const dataList = document.createElement('datalist');
-      dataList.id = 'regions-suggestions';
-      REGION_SUGGESTIONS.forEach((region) => {
-        const option = document.createElement('option');
-        option.value = region;
-        dataList.appendChild(option);
-      });
-      modalFieldContainer.appendChild(dataList);
-    }
   }
 
   modalFieldContainer.appendChild(input);
@@ -185,7 +189,7 @@ function renderStep() {
   nextButton.textContent = currentStep === profileSteps.length - 1 ? 'Terminer' : 'Suivant';
 }
 
-function saveProfile() {
+async function saveProfile() {
   const payload = {
     account: accountData,
     searchOptions: {
@@ -200,6 +204,11 @@ function saveProfile() {
   };
 
   localStorage.setItem('candidateProfile', JSON.stringify(payload));
+
+  await apiRequest('auth.profile.save', {
+    token: getAuthToken(),
+    profile: payload.searchOptions,
+  });
 }
 
 async function restoreSessionIfAny() {
@@ -213,6 +222,13 @@ async function restoreSessionIfAny() {
     const data = await apiRequest('auth.session', { token });
     accountData = { fullName: data.user.fullName || '', email: data.user.email };
     setMessage(`Bienvenue ${accountData.fullName || accountData.email}`);
+
+    if (data.user.hasCompletedProfile) {
+      toggleModal(false);
+      return;
+    }
+
+    toggleModal(true);
     renderStep();
   } catch {
     localStorage.removeItem(AUTH_TOKEN_KEY);
@@ -232,6 +248,7 @@ nextButton.addEventListener('click', () => {
 
   const rawValue = (() => {
     if (step.key === 'contractType') return profileAnswers.contractType || '';
+    if (step.key === 'regions') return Array.from(input?.selectedOptions || []).map((option) => option.value);
     if (step.key === 'startDate') return document.getElementById('start-date-input')?.value || '';
     return input ? input.value : '';
   })();
@@ -247,10 +264,15 @@ nextButton.addEventListener('click', () => {
     return;
   }
 
-  saveProfile();
-  sessionStorage.setItem('profileToast', 'Profil complété avec succès. Vos préférences ont été enregistrées.');
-  modal.classList.add('hidden');
-  showPendingToastIfAny();
+  saveProfile()
+    .then(() => {
+      sessionStorage.setItem('profileToast', 'Profil complété avec succès. Vos préférences ont été enregistrées.');
+      toggleModal(false);
+      showPendingToastIfAny();
+    })
+    .catch((error) => {
+      setMessage(error.message, 'error');
+    });
 });
 
 restoreSessionIfAny();
