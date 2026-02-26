@@ -1,4 +1,4 @@
-const API_BASE = '/public/api.php';
+const API_BASE = 'http://localhost:8000/api.php';
 const AUTH_TOKEN_KEY = 'authToken';
 
 const signupForm = document.getElementById('signup-form');
@@ -194,7 +194,6 @@ function handleOauthTokenFromHash() {
   saveAuthToken(authToken);
   setMessage('Connexion Google réussie. Vous pouvez compléter votre profil.', 'success');
   history.replaceState(null, '', window.location.pathname);
-  openModal();
 }
 
 signupForm.addEventListener('submit', async (event) => {
