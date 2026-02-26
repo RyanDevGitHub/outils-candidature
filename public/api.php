@@ -1,6 +1,16 @@
 <?php
 
 declare(strict_types=1);
+header("Access-Control-Allow-Origin: http://localhost:4173");
+// Autoriser les méthodes et les headers dont on a besoin
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+
+// Gérer la requête "Preflight" (le navigateur envoie une vérification avant le POST)
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
 
 require_once __DIR__ . '/../backend/config.php';
 require_once __DIR__ . '/../backend/db.php';

@@ -1,4 +1,4 @@
-const API_BASE = '/public/api.php';
+const API_BASE = 'http://localhost:8000/api.php';
 
 const signupForm = document.getElementById('signup-form');
 const googleOauthButton = document.getElementById('google-oauth-button');

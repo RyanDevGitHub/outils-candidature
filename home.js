@@ -1,4 +1,4 @@
-const API_BASE = '/public/api.php';
+const API_BASE = 'http://localhost:8000/api.php';
 const AUTH_TOKEN_KEY = 'authToken';
 
 const homeMessage = document.getElementById('home-message');
