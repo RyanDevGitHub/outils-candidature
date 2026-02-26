@@ -103,7 +103,7 @@ function handleApiRequest(string $action, string $method, array $config): void
             'SELECT *
              FROM email_verification_codes
              WHERE user_id = :user_id
-               AND used_at IS NULL
+               AND consumed_at IS NULL
                AND datetime(expires_at) > datetime("now")
              ORDER BY id DESC
              LIMIT 1'
@@ -115,7 +115,7 @@ function handleApiRequest(string $action, string $method, array $config): void
             apiError('Code invalide ou expiré.', 401);
         }
 
-        $pdo->prepare('UPDATE email_verification_codes SET used_at = datetime("now") WHERE id = :id')
+        $pdo->prepare('UPDATE email_verification_codes SET consumed_at = datetime("now") WHERE id = :id')
             ->execute(['id' => $codeRow['id']]);
 
         if (empty($user['email_verified_at'])) {

@@ -44,15 +44,27 @@ function env(string $key, ?string $default = null): ?string
 
 function appConfig(): array
 {
-    $root = dirname(__DIR__);
+    // __DIR__ est le dossier /backend
+    // dirname(__DIR__) remonte d'un cran vers la RACINE du projet
+    $root = dirname(__DIR__); 
+
+    // On s'assure que le .env est bien chargé depuis la racine
+    loadEnv($root . '/.env');
+
+    // On récupère le chemin relatif du .env (ex: "db/app.sqlite")
+    $relPath = env('SQLITE_DB_PATH', 'db/app.sqlite');
+
+    // ÉTAPE CRUCIALE : On crée le chemin ABSOLU
+    // DIRECTORY_SEPARATOR permet de mettre des "\" sur Windows et "/" sur Linux
+    $absoluteDbPath = $root . DIRECTORY_SEPARATOR . $relPath;
 
     return [
         'app_env' => env('APP_ENV', 'local'),
-        'db_path' => env('SQLITE_DB_PATH', $root . '/db/app.sqlite'),
-        'frontend_url' => env('FRONTEND_URL', 'http://127.0.0.1:8000/home.html'),
-        'mail_from' => env('MAIL_FROM', 'no-reply@outils-candidature.local'),
+        'db_path' => $absoluteDbPath, // C'est cette valeur qui ira dans le "new PDO"
+        'frontend_url' => env('FRONTEND_URL', 'http://localhost:4173'),
+        'mail_from' => env('MAIL_FROM', 'no-reply@exemple.com'),
         'google_client_id' => env('GOOGLE_CLIENT_ID', ''),
         'google_client_secret' => env('GOOGLE_CLIENT_SECRET', ''),
-        'google_redirect_uri' => env('GOOGLE_REDIRECT_URI', 'http://127.0.0.1:8000/public/api.php?action=oauth.google.callback'),
+        'google_redirect_uri' => env('GOOGLE_REDIRECT_URI', 'http://localhost:4173/api.php?action=oauth.google.callback'),
     ];
 }

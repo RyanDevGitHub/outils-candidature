@@ -11,9 +11,14 @@ module.exports = defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: "bash -lc 'php scripts/init_db.php && (php -S 127.0.0.1:8000 -t public >/tmp/php-server.log 2>&1 &) && (python3 -m http.server 4173 >/tmp/frontend-server.log 2>&1 &) && wait'",
+    /**
+     * Ici, on lance deux serveurs simples :
+     * 1. PHP pour ton API (port 4173)
+     * 2. Un serveur statique pour tes fichiers HTML/JS (port 4173)
+     */
+    command: "php scripts/init_db.php && npx concurrently \"php -d xdebug.mode=off -S 127.0.0.1:4173 -t public\" \"npx http-server . -p 4173 -a 127.0.0.1\"",
     url: 'http://127.0.0.1:4173/index.html',
-    reuseExistingServer: false,
+    reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },
 });

@@ -4,15 +4,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Outil candidature - Connexion</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Outil candidature - Création de compte</title>
+  <link rel="stylesheet" href="/assets/css/styles.css" />
 </head>
 
 <body>
   <main class="container">
     <section class="card auth-card">
-      <h1>Connexion</h1>
-      <p class="subtitle">Connectez-vous avec votre e-mail (code de vérification) ou avec Google.</p>
+      <h1>Créer un compte</h1>
+      <p class="subtitle">Authentification passwordless par e-mail (code) ou OAuth Google.</p>
 
       <div class="social-stack" aria-label="Connexion avec un réseau social">
         <button id="google-oauth-button" type="button" class="social-button social-google">
@@ -21,9 +21,12 @@
         </button>
       </div>
 
-      <form id="login-form" novalidate>
+      <form id="signup-form" novalidate>
         <fieldset>
-          <legend>Connexion par e-mail</legend>
+          <legend>Inscription par e-mail</legend>
+
+          <label for="fullName">Nom complet</label>
+          <input id="fullName" name="fullName" type="text" placeholder="Votre nom complet" required />
 
           <label for="email">E-mail</label>
           <input id="email" name="email" type="email" placeholder="Votre adresse e-mail" required />
@@ -44,14 +47,15 @@
       </form>
 
       <p class="switch-auth">
-        Pas encore de compte ? <a href="index.html" class="login-link">Créer un compte</a>
+        Vous avez déjà un compte ? <a href="/" class="login-link">Se connecter</a>
       </p>
 
       <p id="message" class="message" aria-live="polite"></p>
     </section>
+
   </main>
 
-  <script src="login.js"></script>
+  <script src="/assets/js/login.js"></script>
 </body>
 
 </html>

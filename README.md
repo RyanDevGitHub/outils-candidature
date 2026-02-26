@@ -1,6 +1,7 @@
 # Outil candidature
 
 Prototype web (HTML/CSS/JS + PHP + SQLite) pour :
+
 - créer un utilisateur par e-mail en mode **passwordless** (code de vérification),
 - proposer la connexion sociale (**OAuth Google**),
 - compléter ensuite un profil de recherche d'emploi en multi-étapes.
@@ -23,7 +24,7 @@ Cela crée `db/app.sqlite` et applique `db/schema.sql`.
 
 ```bash
 python3 -m http.server 4173
-php -S localhost:8000 -t public
+php -S localhost:4173 -t public
 ```
 
 Puis ouvrir <http://127.0.0.1:4173/index.html>.
@@ -46,8 +47,9 @@ npm run test:e2e
 ```
 
 La configuration Playwright démarre automatiquement:
+
 - l'initialisation de la base (`php scripts/init_db.php`),
-- le backend PHP (`http://127.0.0.1:8000`),
+- le backend PHP (`http://127.0.0.1:4173`),
 - le frontend statique (`http://127.0.0.1:4173`).
 
 ## Variables d'environnement (OAuth Google)
@@ -55,8 +57,8 @@ La configuration Playwright démarre automatiquement:
 ```bash
 export GOOGLE_CLIENT_ID="..."
 export GOOGLE_CLIENT_SECRET="..."
-export GOOGLE_REDIRECT_URI="http://127.0.0.1:8000/public/api.php?action=oauth.google.callback"
-export FRONTEND_URL="http://127.0.0.1:8000/home.html"
+export GOOGLE_REDIRECT_URI="http://127.0.0.1:4173/public/api.php?action=oauth.google.callback"
+export FRONTEND_URL="http://127.0.0.1:4173/home.html"
 ```
 
 Sans ces variables, le flux Google renvoie une erreur explicite côté API.

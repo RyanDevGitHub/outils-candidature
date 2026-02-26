@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8000/api.php';
+const API_BASE = 'http://localhost:4173/api.php';
 const AUTH_TOKEN_KEY = 'authToken';
 
 const modal = document.getElementById('profile-modal');
@@ -26,6 +26,17 @@ let accountData = null;
 let currentStep = 0;
 const profileAnswers = {};
 
+
+function handleOauthTokenFromHash() {
+  console.log('Checking for OAuth token in URL hash');
+  const hash = window.location.hash.replace(/^#/, '');
+  const params = new URLSearchParams(hash);
+  const authToken = params.get('authToken');
+  if (!authToken) return;
+
+  saveAuthToken(authToken);
+  setMessage('Connexion Google réussie. Redirection vers la suite de l’inscription.', 'success');
+}
 function toggleModal(visible) {
   modal.classList.toggle('hidden', !visible);
   modal.setAttribute('aria-hidden', visible ? 'false' : 'true');
@@ -204,8 +215,8 @@ async function saveProfile() {
   };
 
   localStorage.setItem('candidateProfile', JSON.stringify(payload));
-
-  await apiRequest('auth.profile.save', {
+  
+  await apiRequest('profile.save', {
     token: getAuthToken(),
     profile: payload.searchOptions,
   });
@@ -214,7 +225,7 @@ async function saveProfile() {
 async function restoreSessionIfAny() {
   const token = getAuthToken();
   if (!token) {
-    window.location.href = 'index.html';
+    // window.location.href = '/';
     return;
   }
 
@@ -230,9 +241,10 @@ async function restoreSessionIfAny() {
 
     toggleModal(true);
     renderStep();
-  } catch {
+  } catch (error) {
+    console.error('Error restoring session:', error);
     localStorage.removeItem(AUTH_TOKEN_KEY);
-    window.location.href = 'index.html';
+    window.location.href = '/';
   }
 }
 
@@ -274,6 +286,12 @@ nextButton.addEventListener('click', () => {
       setMessage(error.message, 'error');
     });
 });
-
-restoreSessionIfAny();
+handleOauthTokenFromHash();
+// On ne vérifie la session QUE si on a un token
+if (getAuthToken()) {
+    restoreSessionIfAny();
+} else {
+    // Si vraiment pas de token du tout, on renvoie à l'accueil
+    // window.location.href = '/';
+}
 showPendingToastIfAny();

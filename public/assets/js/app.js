@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8000/api.php';
+const API_BASE = 'http://localhost:4173/api.php';
 const AUTH_TOKEN_KEY = 'authToken';
 
 const signupForm = document.getElementById('signup-form');
@@ -45,7 +45,7 @@ async function restoreSessionIfAny() {
   try {
     const data = await apiRequest('auth.session', { token });
     accountData = { fullName: data.user.fullName || '', email: data.user.email };
-    window.location.href = 'home.html';
+    window.location.href = '/home';
     setMessage(`Session active: ${data.user.email}`, 'success');
   } catch {
     localStorage.removeItem(AUTH_TOKEN_KEY);
@@ -115,7 +115,7 @@ verifyForm.addEventListener('submit', async (event) => {
     saveAuthToken(data.token);
     
     // On redirige vers home.html
-    window.location.href = 'home.html';
+    window.location.href = '/home';
     
   } catch (error) {
     setMessage(error.message, 'error');

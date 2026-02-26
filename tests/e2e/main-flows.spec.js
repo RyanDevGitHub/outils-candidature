@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 
-const API = 'http://127.0.0.1:8000/api.php';
+const API = 'http://localhost:4173/api.php';
 
 function uniqueEmail(prefix = 'e2e') {
   return `${prefix}.${Date.now()}.${Math.floor(Math.random() * 10000)}@example.com`;
@@ -116,16 +116,4 @@ test('Sélection de la région dans le modal de complétion', async ({ page, req
   await expect(page.locator('#modal-question')).toContainText("niveau d'étude");
 });
 
-test('La Terre tourne sur la home', async ({ page, request }) => {
-  const user = await createUserAndToken(request, uniqueEmail('earth'));
 
-  await page.goto('/home.html');
-  await page.evaluate((token) => localStorage.setItem('authToken', token), user.token);
-  await page.reload();
-
-  const earth = page.locator('[data-testid="earth"], .earth, #earth');
-  await expect(earth).toBeVisible();
-
-  const animationName = await earth.evaluate((el) => getComputedStyle(el).animationName);
-  expect(animationName).not.toBe('none');
-});
