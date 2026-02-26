@@ -1,14 +1,16 @@
 <?php
+
 declare(strict_types=1);
 header("Access-Control-Allow-Origin: http://localhost:4173");
+// Autoriser les méthodes et les headers dont on a besoin
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
+// Gérer la requête "Preflight" (le navigateur envoie une vérification avant le POST)
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
 }
-
 
 require_once __DIR__ . '/../backend/config.php';
 require_once __DIR__ . '/../backend/db.php';
@@ -19,22 +21,7 @@ $config = appConfig();
 $action = $_GET['action'] ?? '';
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
-$debugInfo = [
-    'date'   => date('Y-m-d H:i:s'),
-    'action' => $action,
-    'method' => $method,
-    'get'    => $_GET,
-    'post'   => $_POST,
-    'body'   => json_decode(file_get_contents('php://input'), true) // Pour voir le contenu du fetch
-];
-
-// On écrit tout ça dans un fichier nommé "api_debug.log" à côté de api.php
-file_put_contents(
-    __DIR__ . '/api_debug.log', 
-    print_r($debugInfo, true), 
-    FILE_APPEND
-);
-function upsertEmailUser(string $email, string $fullName = 'User'): array
+function upsertEmailUser(string $email, string $fullName): array
 {
     $pdo = db();
 
@@ -43,10 +30,11 @@ function upsertEmailUser(string $email, string $fullName = 'User'): array
     $user = $select->fetch();
 
     if ($user) {
+        $provider = ($user['auth_provider'] === 'google') ? 'google' : 'email';
         $stmt = $pdo->prepare('UPDATE users SET full_name = :full_name, auth_provider = :auth_provider, updated_at = datetime("now") WHERE id = :id');
         $stmt->execute([
             'full_name' => $fullName,
-            'auth_provider' => 'email',
+            'auth_provider' => $provider,
             'id' => $user['id'],
         ]);
 
@@ -109,14 +97,14 @@ function currentUserByToken(string $plainToken): ?array
 
 if ($action === 'auth.email.start' && $method === 'POST') {
     $body = jsonBody();
-    // $fullName = trim((string) ($body['fullName'] ?? ''));
+    $fullName = trim((string) ($body['fullName'] ?? ''));
     $email = trim((string) ($body['email'] ?? ''));
 
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    if ($fullName === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         jsonResponse(['ok' => false, 'error' => 'Nom ou email invalide.'], 422);
     }
 
-    $user = upsertEmailUser($email);
+    $user = upsertEmailUser($email, $fullName);
 
     $code = randomCode(6);
     $codeHash = hashValue($code);
@@ -130,7 +118,10 @@ if ($action === 'auth.email.start' && $method === 'POST') {
         'expires_at' => $expiresAt,
     ]);
 
-    sendVerificationEmail($email, $code);
+    $sent = sendVerificationEmail($email, $code);
+    if (!$sent && $config['app_env'] !== 'local') {
+        jsonResponse(['ok' => false, 'error' => 'Échec de l\'envoi de l\'email.'], 500);
+    }
 
     $payload = ['ok' => true, 'message' => 'Code de vérification envoyé.'];
     if ($config['app_env'] === 'local') {
@@ -309,6 +300,7 @@ if ($action === 'oauth.google.callback' && $method === 'GET') {
     }
 
     $pdo = db();
+    
     $stmt = $pdo->prepare('SELECT * FROM users WHERE auth_provider = :provider AND provider_user_id = :provider_user_id LIMIT 1');
     $stmt->execute(['provider' => 'google', 'provider_user_id' => $googleId]);
     $user = $stmt->fetch();
@@ -322,23 +314,57 @@ if ($action === 'oauth.google.callback' && $method === 'GET') {
             $update = $pdo->prepare('UPDATE users SET auth_provider = :auth_provider, provider_user_id = :provider_user_id, email_verified_at = datetime("now") WHERE id = :id');
             $update->execute([
                 'auth_provider'    => 'google',
-                'provider_user_id' => $googleId, // Variable reçue de Google
+                'provider_user_id' => $provider_user_id, // Variable reçue de Google
                 'id'               => $existingUser['id']
             ]);
         
-            $stmt->execute(['auth_provider' => 'google', 'provider_user_id' => $googleId]);
+            $stmt->execute(['auth_provider' => 'google', 'provider_user_id' => $provider_user_id]);
             $user = $stmt->fetch();
             
+       } else {
+        // 1. Théorie : On vérifie d'abord si l'email existe déjà, même sans Google ID
+        $checkEmail = $pdo->prepare('SELECT id FROM users WHERE email = :email LIMIT 1');
+        $checkEmail->execute(['email' => mb_strtolower($email)]);
+        $existingUser = $checkEmail->fetch();
+
+        if ($existingUser) {
+            // 2. Pratique : Si l'email existe, on "lie" le compte Google à cet utilisateur
+            $update = $pdo->prepare('
+                UPDATE users 
+                SET auth_provider = "google", 
+                    provider_user_id = :provider_user_id, 
+                    email_verified_at = datetime("now"),
+                    updated_at = datetime("now")
+                WHERE id = :id
+            ');
+            $update->execute([
+                'provider_user_id' => $googleId,
+                'id' => $existingUser['id']
+            ]);
+            
+            // On récupère les infos complètes de l'utilisateur mis à jour
+            $stmt = $pdo->prepare('SELECT * FROM users WHERE id = :id');
+            $stmt->execute(['id' => $existingUser['id']]);
+            $user = $stmt->fetch();
         } else {
-            $insert = $pdo->prepare('INSERT INTO users (full_name, email, password_hash, auth_provider, provider_user_id, email_verified_at) VALUES (:full_name, :email, :password_hash, :auth_provider, :provider_user_id, datetime("now"))');
+            // 3. Succès : Si vraiment rien n'existe, on crée le nouveau profil
+            $insert = $pdo->prepare('
+                INSERT INTO users (full_name, email, password_hash, auth_provider, provider_user_id, email_verified_at) 
+                VALUES (:full_name, :email, :password_hash, :auth_provider, :provider_user_id, datetime("now"))
+            ');
             $insert->execute([
                 'full_name'        => $name,
-                'email'            => $email,
+                'email'            => mb_strtolower($email),
                 'password_hash'    => null,
                 'auth_provider'    => 'google',
                 'provider_user_id' => $googleId
             ]);
-            $user = ['id' => $pdo->lastInsertId(), 'email' => $email];
+            
+            $id = (int) $pdo->lastInsertId();
+            $stmt = $pdo->prepare('SELECT * FROM users WHERE id = :id');
+            $stmt->execute(['id' => $id]);
+            $user = $stmt->fetch();
+        }
         }
     }
 

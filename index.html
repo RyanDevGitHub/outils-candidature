@@ -1,88 +1,43 @@
 <!doctype html>
 <html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Outil candidature - Inscription</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <section class="card auth-card">
+        <h1>Créer un compte</h1>
+        <p class="subtitle">Entrez votre e-mail, puis validez le code sur la page Home.</p>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Outil candidature - Création de compte</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-
-<body>
-  <main class="container">
-    <section class="card auth-card">
-      <h1>Créer un compte</h1>
-      <p class="subtitle">Authentification passwordless par e-mail (code) ou OAuth Google.</p>
-
-      <div class="social-stack" aria-label="Connexion avec un réseau social">
-        <button id="google-oauth-button" type="button" class="social-button social-google">
-          <span class="icon" aria-hidden="true">G</span>
-          Continuer avec Google
-        </button>
-      </div>
-
-      <form id="signup-form" novalidate>
-        <fieldset>
-          <legend>Inscription par e-mail</legend>
-
-          <label for="fullName">Nom complet</label>
-          <input id="fullName" name="fullName" type="text" placeholder="Votre nom complet" required />
-
-          <label for="email">E-mail</label>
-          <input id="email" name="email" type="email" placeholder="Votre adresse e-mail" required />
-        </fieldset>
-
-        <button type="submit" class="primary-cta">Envoyer un code de vérification</button>
-      </form>
-
-      <form id="verify-form" class="hidden" novalidate>
-        <fieldset>
-          <legend>Vérifier votre e-mail</legend>
-          <label for="verificationCode">Code reçu par e-mail</label>
-          <input id="verificationCode" name="verificationCode" type="text" minlength="6" maxlength="6"
-            placeholder="Ex: 123456" required />
-        </fieldset>
-
-        <button type="submit" class="primary-cta">Valider le code</button>
-      </form>
-
-      <p class="switch-auth">
-        Vous avez déjà un compte ? <a href="#" class="login-link">Se connecter</a>
-      </p>
-
-      <p id="message" class="message" aria-live="polite"></p>
-    </section>
-
-    <section id="profile-preview" class="card preview hidden" aria-live="polite">
-      <h2>Résultat possible : aperçu du profil enregistré</h2>
-      <p class="subtitle">Voici ce qui est sauvegardé une fois le profil complété.</p>
-      <pre id="preview-content" class="preview-content"></pre>
-    </section>
-  </main>
-
-  <section id="profile-modal" class="modal hidden" aria-hidden="true" role="dialog" aria-modal="true"
-    aria-labelledby="modal-title">
-    <div class="modal-card">
-      <div class="progress-header">
-        <p id="progress-text" class="progress-text">Finalisation du profil : 0%</p>
-        <div class="progress-track" aria-hidden="true">
-          <div id="progress-bar" class="progress-bar"></div>
+        <div class="social-stack" aria-label="Connexion avec un réseau social">
+          <button id="google-oauth-button" type="button" class="social-button social-google">
+            <span class="icon" aria-hidden="true">G</span>
+            Continuer avec Google
+          </button>
         </div>
-      </div>
 
-      <h2 id="modal-title">Compléter votre profil</h2>
-      <p id="modal-question" class="modal-question"></p>
+        <form id="signup-form" novalidate>
+          <fieldset>
+            <legend>Inscription par e-mail</legend>
 
-      <div id="modal-field-container" class="modal-field-container"></div>
+            <label for="fullName">Nom complet</label>
+            <input id="fullName" name="fullName" type="text" placeholder="Votre nom complet" required />
 
-      <div class="modal-actions">
-        <button id="back-button" type="button" class="secondary">Retour</button>
-        <button id="next-button" type="button">Suivant</button>
-      </div>
-    </div>
-  </section>
+            <label for="email">E-mail</label>
+            <input id="email" name="email" type="email" placeholder="Votre adresse e-mail" required />
+          </fieldset>
 
-  <script src="app.js"></script>
-</body>
+          <button type="submit" class="primary-cta">Envoyer un code de vérification</button>
+        </form>
 
+        <p class="switch-auth">Vous avez déjà un compte ? <a href="#" class="login-link">Se connecter</a></p>
+        <p id="message" class="message" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
 </html>
