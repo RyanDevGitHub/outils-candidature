@@ -242,10 +242,54 @@ button:hover {
   display: grid;
 }
 
+.contract-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.6rem;
+}
+
+.contract-option {
+  border: 1px solid #2f2f2f;
+  background: #121212;
+  border-radius: 10px;
+  padding: 0.75rem;
+  transition: all 150ms ease;
+}
+
+.contract-option:hover {
+  border-color: #facc15;
+  background: #1d1a09;
+}
+
+.contract-option.selected {
+  border-color: #facc15;
+  background: #2a2307;
+  box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.25) inset;
+}
+
 .modal-actions {
   display: flex;
   justify-content: space-between;
   gap: 0.7rem;
+}
+
+.date-widget {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.date-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.date-quick-button {
+  background: #1f1f1f;
+  border: 1px solid #3a3a3a;
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.9rem;
 }
 
 .secondary {
