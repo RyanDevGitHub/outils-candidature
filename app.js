@@ -1,8 +1,6 @@
 const API_BASE = 'http://localhost:8000/api.php';
-const AUTH_TOKEN_KEY = 'authToken';
 
 const signupForm = document.getElementById('signup-form');
-const verifyForm = document.getElementById('verify-form');
 const googleOauthButton = document.getElementById('google-oauth-button');
 const message = document.getElementById('message');
 
@@ -66,8 +64,8 @@ signupForm.addEventListener('submit', async (event) => {
   event.preventDefault();
 
   if (!signupForm.checkValidity()) {
-    setMessage('Merci de renseigner tous les champs obligatoires.', 'error');
     signupForm.reportValidity();
+    setMessage('Merci de renseigner tous les champs obligatoires.', 'error');
     return;
   }
 
@@ -76,30 +74,10 @@ signupForm.addEventListener('submit', async (event) => {
 
   try {
     const data = await apiRequest('auth.email.start', { fullName, email });
-    pendingEmail = email;
-    accountData = { fullName, email };
-    verifyForm.classList.remove('hidden');
-    setMessage(
-      data.debugCode
-        ? `Code envoyé. (dev: ${data.debugCode})`
-        : 'Code envoyé par e-mail. Vérifiez votre boîte de réception.',
-      'success'
-    );
-  } catch (error) {
-    setMessage(error.message, 'error');
-  }
-});
-
-verifyForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
-
-  if (!verifyForm.checkValidity()) {
-    verifyForm.reportValidity();
-    setMessage('Code de vérification invalide.', 'error');
-    return;
-  }
-
-  const code = verifyForm.verificationCode.value.trim();
+    const params = new URLSearchParams({ email, fullName });
+    if (data.debugCode) {
+      params.set('debugCode', data.debugCode);
+    }
 
   try {
     const data = await apiRequest('auth.email.verify', { email: pendingEmail, code });
