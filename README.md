@@ -19,20 +19,21 @@ php scripts/init_db.php
 
 Cela crée `db/app.sqlite` et applique `db/schema.sql`.
 
-## Lancer le projet (front + backend)
+## Initialiser et lancer le projet
 
 ```bash
-php -S 127.0.0.1:8000
+python3 -m http.server 4173
+php -S localhost:8000 -t public
 ```
 
-Puis ouvrir <http://127.0.0.1:8000/index.html>.
+Puis ouvrir <http://127.0.0.1:4173/index.html>.
 
-## Nouveau flow Home
+## Flows authentification
 
-1. Depuis `index.html`, l'utilisateur saisit son nom + e-mail.
-2. Le code est envoyé, puis redirection vers `home.html`.
-3. Sur `home.html`, une **modal de vérification** s'ouvre pour saisir le code.
-4. Après validation, le token est stocké en `localStorage` (`authToken`) et la modal profil s'ouvre.
+1. **Création de compte** (`index.html`) : nom + e-mail, puis code de vérification.
+2. **Connexion** (`login.html`) : e-mail uniquement, puis code de vérification.
+3. **Connexion instantanée** : si `authToken` existe en `localStorage` et est valide, redirection automatique vers `home.html`.
+4. **OAuth Google** : disponible depuis les pages d'inscription et de connexion.
 
 ## Variables d'environnement (OAuth Google)
 
@@ -48,6 +49,7 @@ Sans ces variables, le flux Google renvoie une erreur explicite côté API.
 ## Endpoints backend
 
 - `POST /public/api.php?action=auth.email.start`
+- `POST /public/api.php?action=auth.email.login.start`
 - `POST /public/api.php?action=auth.email.verify`
 - `POST /public/api.php?action=auth.session`
 - `GET /public/api.php?action=oauth.google.start`

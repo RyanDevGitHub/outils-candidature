@@ -4,15 +4,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Outil candidature - Création de compte</title>
+  <title>Outil candidature - Connexion</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
   <main class="container">
     <section class="card auth-card">
-      <h1>Créer un compte</h1>
-      <p class="subtitle">Authentification passwordless par e-mail (code) ou OAuth Google.</p>
+      <h1>Connexion</h1>
+      <p class="subtitle">Connectez-vous avec votre e-mail (code de vérification) ou avec Google.</p>
 
       <div class="social-stack" aria-label="Connexion avec un réseau social">
         <button id="google-oauth-button" type="button" class="social-button social-google">
@@ -21,12 +21,9 @@
         </button>
       </div>
 
-      <form id="signup-form" novalidate>
+      <form id="login-form" novalidate>
         <fieldset>
-          <legend>Inscription par e-mail</legend>
-
-          <label for="fullName">Nom complet</label>
-          <input id="fullName" name="fullName" type="text" placeholder="Votre nom complet" required />
+          <legend>Connexion par e-mail</legend>
 
           <label for="email">E-mail</label>
           <input id="email" name="email" type="email" placeholder="Votre adresse e-mail" required />
@@ -47,15 +44,14 @@
       </form>
 
       <p class="switch-auth">
-        Vous avez déjà un compte ? <a href="login.html" class="login-link">Se connecter</a>
+        Pas encore de compte ? <a href="index.html" class="login-link">Créer un compte</a>
       </p>
 
       <p id="message" class="message" aria-live="polite"></p>
     </section>
-
   </main>
 
-  <script src="app.js"></script>
+  <script src="login.js"></script>
 </body>
 
 </html>
