@@ -20,10 +20,11 @@ function upsertEmailUser(string $email, string $fullName): array
     $user = $select->fetch();
 
     if ($user) {
+        $provider = ($user['auth_provider'] === 'google') ? 'google' : 'email';
         $stmt = $pdo->prepare('UPDATE users SET full_name = :full_name, auth_provider = :auth_provider, updated_at = datetime("now") WHERE id = :id');
         $stmt->execute([
             'full_name' => $fullName,
-            'auth_provider' => 'email',
+            'auth_provider' => $provider,
             'id' => $user['id'],
         ]);
 
@@ -107,7 +108,10 @@ if ($action === 'auth.email.start' && $method === 'POST') {
         'expires_at' => $expiresAt,
     ]);
 
-    sendVerificationEmail($email, $code);
+    $sent = sendVerificationEmail($email, $code);
+    if (!$sent && $config['app_env'] !== 'local') {
+        jsonResponse(['ok' => false, 'error' => 'Échec de l\'envoi de l\'email.'], 500);
+    }
 
     $payload = ['ok' => true, 'message' => 'Code de vérification envoyé.'];
     if ($config['app_env'] === 'local') {
@@ -286,6 +290,7 @@ if ($action === 'oauth.google.callback' && $method === 'GET') {
     }
 
     $pdo = db();
+    
     $stmt = $pdo->prepare('SELECT * FROM users WHERE auth_provider = :provider AND provider_user_id = :provider_user_id LIMIT 1');
     $stmt->execute(['provider' => 'google', 'provider_user_id' => $googleId]);
     $user = $stmt->fetch();
@@ -306,16 +311,50 @@ if ($action === 'oauth.google.callback' && $method === 'GET') {
             $stmt->execute(['auth_provider' => 'google', 'provider_user_id' => $provider_user_id]);
             $user = $stmt->fetch();
             
+       } else {
+        // 1. Théorie : On vérifie d'abord si l'email existe déjà, même sans Google ID
+        $checkEmail = $pdo->prepare('SELECT id FROM users WHERE email = :email LIMIT 1');
+        $checkEmail->execute(['email' => mb_strtolower($email)]);
+        $existingUser = $checkEmail->fetch();
+
+        if ($existingUser) {
+            // 2. Pratique : Si l'email existe, on "lie" le compte Google à cet utilisateur
+            $update = $pdo->prepare('
+                UPDATE users 
+                SET auth_provider = "google", 
+                    provider_user_id = :provider_user_id, 
+                    email_verified_at = datetime("now"),
+                    updated_at = datetime("now")
+                WHERE id = :id
+            ');
+            $update->execute([
+                'provider_user_id' => $googleId,
+                'id' => $existingUser['id']
+            ]);
+            
+            // On récupère les infos complètes de l'utilisateur mis à jour
+            $stmt = $pdo->prepare('SELECT * FROM users WHERE id = :id');
+            $stmt->execute(['id' => $existingUser['id']]);
+            $user = $stmt->fetch();
         } else {
-            $insert = $pdo->prepare('INSERT INTO users (full_name, email, password_hash, auth_provider, provider_user_id, email_verified_at) VALUES (:full_name, :email, :password_hash, :auth_provider, :provider_user_id, datetime("now"))');
+            // 3. Succès : Si vraiment rien n'existe, on crée le nouveau profil
+            $insert = $pdo->prepare('
+                INSERT INTO users (full_name, email, password_hash, auth_provider, provider_user_id, email_verified_at) 
+                VALUES (:full_name, :email, :password_hash, :auth_provider, :provider_user_id, datetime("now"))
+            ');
             $insert->execute([
-                'full_name'        => $full_name,
-                'email'            => $email,
+                'full_name'        => $name,
+                'email'            => mb_strtolower($email),
                 'password_hash'    => null,
                 'auth_provider'    => 'google',
-                'provider_user_id' => $provider_user_id
+                'provider_user_id' => $googleId
             ]);
-            $user = ['id' => $pdo->lastInsertId(), 'email' => $email];
+            
+            $id = (int) $pdo->lastInsertId();
+            $stmt = $pdo->prepare('SELECT * FROM users WHERE id = :id');
+            $stmt->execute(['id' => $id]);
+            $user = $stmt->fetch();
+        }
         }
     }
 
