@@ -2,8 +2,10 @@ const API_BASE = 'http://localhost:8000/api.php';
 const AUTH_TOKEN_KEY = 'authToken';
 
 const signupForm = document.getElementById('signup-form');
+const verifyForm = document.getElementById('verify-form');
 const googleOauthButton = document.getElementById('google-oauth-button');
 const message = document.getElementById('message');
+
 
 let accountData = null;
 let pendingEmail = '';
@@ -74,22 +76,47 @@ signupForm.addEventListener('submit', async (event) => {
   const email = signupForm.email.value.trim();
 
   try {
+    // 1. On demande l'envoi du code au serveur
     const data = await apiRequest('auth.email.start', { fullName, email });
-    const params = new URLSearchParams({ email, fullName });
-    if (data.debugCode) {
-      params.set('debugCode', data.debugCode);
-    }
+    
+    // On mémorise l'email pour la prochaine étape
+    pendingEmail = email;
+    accountData = { fullName, email };
 
-    try {
-      const data = await apiRequest('auth.email.verify', { email: pendingEmail, code });
-      saveAuthToken(data.token);
-      accountData = { fullName: data.user.fullName || '', email: data.user.email };
-      verifyForm.reset();
-      verifyForm.classList.add('hidden');
-      setMessage('E-mail vérifié. Redirection vers la suite.', 'success');Z
-    } catch (error) {
-      setMessage(error.message, 'error');
-    }
+    // 2. On affiche le formulaire de vérification (le champ pour taper le code)
+    verifyForm.classList.remove('hidden'); 
+    signupForm.classList.add('hidden'); // Optionnel : cache le formulaire d'inscription
+
+    // 3. On affiche le message de succès (et le debugCode si on est en local)
+    setMessage(
+      data.debugCode 
+        ? `Code envoyé. (dev: ${data.debugCode})` 
+        : 'Code envoyé par e-mail. Vérifiez votre boîte de réception.',
+      'success'
+    );
+
+  } catch (error) {
+    setMessage(error.message, 'error');
+  }
+});
+verifyForm.addEventListener('submit', async (event) => {
+  event.preventDefault(); // Empêche le rechargement de la page (ton problème actuel)
+
+  const code = verifyForm.verificationCode.value.trim();
+
+  try {
+    // On appelle l'API pour vérifier le code
+    const data = await apiRequest('auth.email.verify', { 
+      email: pendingEmail, 
+      code: code 
+    });
+
+    // Si ça marche, on stocke le token
+    saveAuthToken(data.token);
+    
+    // On redirige vers home.html
+    window.location.href = 'home.html';
+    
   } catch (error) {
     setMessage(error.message, 'error');
   }
