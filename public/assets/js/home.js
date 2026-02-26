@@ -223,8 +223,9 @@ async function saveProfile() {
 
 async function restoreSessionIfAny() {
   const token = getAuthToken();
+  console.log('Restoring session with token:', token);
   if (!token) {
-    // window.location.href = '/';
+    window.location.href = '/';
     return;
   }
 
@@ -285,11 +286,5 @@ nextButton.addEventListener('click', () => {
       setMessage(error.message, 'error');
     });
 });
-// On ne vérifie la session QUE si on a un token
-if (getAuthToken()) {
-    restoreSessionIfAny();
-} else {
-    // Si vraiment pas de token du tout, on renvoie à l'accueil
-    // window.location.href = '/';
-}
+restoreSessionIfAny();
 showPendingToastIfAny();
