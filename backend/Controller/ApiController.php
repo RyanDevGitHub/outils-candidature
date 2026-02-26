@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 function handleApiRequest(string $action, string $method, array $config): void
 {
+    $authCookieOptions = [
+        'expires' => time() + (30 * 24 * 60 * 60),
+        'path' => '/',
+        'httponly' => false,
+        'samesite' => 'Lax',
+    ];
+
     if ($action === 'auth.email.start' && $method === 'POST') {
         $body = jsonBody();
         $fullName = trim((string) ($body['fullName'] ?? ''));
@@ -124,6 +131,8 @@ function handleApiRequest(string $action, string $method, array $config): void
         }
 
         $token = createAuthToken((int) $user['id']);
+
+        setcookie('authToken', $token, $authCookieOptions);
 
         apiOk([
             'token' => $token,
@@ -341,7 +350,8 @@ function handleApiRequest(string $action, string $method, array $config): void
 
         $token = createAuthToken((int) $user['id']);
 
-        apiRedirect($config['frontend_url'] . '#authToken=' . urlencode($token));
+        setcookie('authToken', $token, $authCookieOptions);
+        apiRedirect('/home');
     }
 
     apiError('Route introuvable.', 404);

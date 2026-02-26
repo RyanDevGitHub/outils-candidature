@@ -1,5 +1,4 @@
 const API_BASE = 'http://localhost:4173/api.php';
-const AUTH_TOKEN_KEY = 'authToken';
 
 const modal = document.getElementById('profile-modal');
 const modalQuestion = document.getElementById('modal-question');
@@ -27,16 +26,6 @@ let currentStep = 0;
 const profileAnswers = {};
 
 
-function handleOauthTokenFromHash() {
-  console.log('Checking for OAuth token in URL hash');
-  const hash = window.location.hash.replace(/^#/, '');
-  const params = new URLSearchParams(hash);
-  const authToken = params.get('authToken');
-  if (!authToken) return;
-
-  saveAuthToken(authToken);
-  setMessage('Connexion Google réussie. Redirection vers la suite de l’inscription.', 'success');
-}
 function toggleModal(visible) {
   modal.classList.toggle('hidden', !visible);
   modal.setAttribute('aria-hidden', visible ? 'false' : 'true');
@@ -55,8 +44,18 @@ function showPendingToastIfAny() {
   sessionStorage.removeItem('profileToast');
 }
 
+function getCookie(name) {
+  const escapedName = name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+  const match = document.cookie.match(new RegExp(`(?:^|; )${escapedName}=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : '';
+}
+
+function deleteCookie(name) {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax`;
+}
+
 function getAuthToken() {
-  return localStorage.getItem(AUTH_TOKEN_KEY) || '';
+  return getCookie('authToken');
 }
 
 async function apiRequest(action, payload) {
@@ -243,7 +242,7 @@ async function restoreSessionIfAny() {
     renderStep();
   } catch (error) {
     console.error('Error restoring session:', error);
-    localStorage.removeItem(AUTH_TOKEN_KEY);
+    deleteCookie('authToken');
     window.location.href = '/';
   }
 }
@@ -286,7 +285,6 @@ nextButton.addEventListener('click', () => {
       setMessage(error.message, 'error');
     });
 });
-handleOauthTokenFromHash();
 // On ne vérifie la session QUE si on a un token
 if (getAuthToken()) {
     restoreSessionIfAny();
