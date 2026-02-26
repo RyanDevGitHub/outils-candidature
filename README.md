@@ -35,6 +35,21 @@ Puis ouvrir <http://127.0.0.1:4173/index.html>.
 3. **Connexion instantanée** : si `authToken` existe en `localStorage` et est valide, redirection automatique vers `home.html`.
 4. **OAuth Google** : disponible depuis les pages d'inscription et de connexion.
 
+## Tests End-to-End (Playwright)
+
+Depuis l'ajout de la suite E2E, **Node.js / npm** est nécessaire pour installer et exécuter les tests.
+
+```bash
+npm install
+npx playwright install
+npm run test:e2e
+```
+
+La configuration Playwright démarre automatiquement:
+- l'initialisation de la base (`php scripts/init_db.php`),
+- le backend PHP (`http://127.0.0.1:8000`),
+- le frontend statique (`http://127.0.0.1:4173`).
+
 ## Variables d'environnement (OAuth Google)
 
 ```bash
