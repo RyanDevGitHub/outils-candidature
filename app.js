@@ -1,4 +1,5 @@
 const API_BASE = 'http://localhost:8000/api.php';
+const AUTH_TOKEN_KEY = 'authToken';
 
 const signupForm = document.getElementById('signup-form');
 const googleOauthButton = document.getElementById('google-oauth-button');
@@ -42,6 +43,7 @@ async function restoreSessionIfAny() {
   try {
     const data = await apiRequest('auth.session', { token });
     accountData = { fullName: data.user.fullName || '', email: data.user.email };
+    window.location.href = 'home.html';
     setMessage(`Session active: ${data.user.email}`, 'success');
   } catch {
     localStorage.removeItem(AUTH_TOKEN_KEY);
@@ -49,6 +51,7 @@ async function restoreSessionIfAny() {
 }
 
 function handleOauthTokenFromHash() {
+  console.log('Checking for OAuth token in URL hash');
   const hash = window.location.hash.replace(/^#/, '');
   const params = new URLSearchParams(hash);
   const authToken = params.get('authToken');
@@ -56,8 +59,6 @@ function handleOauthTokenFromHash() {
 
   saveAuthToken(authToken);
   setMessage('Connexion Google réussie. Redirection vers la suite de l’inscription.', 'success');
-  history.replaceState(null, '', window.location.pathname);
-  window.location.href = 'home.html';
 }
 
 signupForm.addEventListener('submit', async (event) => {
@@ -79,22 +80,25 @@ signupForm.addEventListener('submit', async (event) => {
       params.set('debugCode', data.debugCode);
     }
 
-  try {
-    const data = await apiRequest('auth.email.verify', { email: pendingEmail, code });
-    saveAuthToken(data.token);
-    accountData = { fullName: data.user.fullName || '', email: data.user.email };
-    verifyForm.reset();
-    verifyForm.classList.add('hidden');
-    setMessage('E-mail vérifié. Redirection vers la suite.', 'success');
-    window.location.href = 'home.html';
+    try {
+      const data = await apiRequest('auth.email.verify', { email: pendingEmail, code });
+      saveAuthToken(data.token);
+      accountData = { fullName: data.user.fullName || '', email: data.user.email };
+      verifyForm.reset();
+      verifyForm.classList.add('hidden');
+      setMessage('E-mail vérifié. Redirection vers la suite.', 'success');Z
+    } catch (error) {
+      setMessage(error.message, 'error');
+    }
   } catch (error) {
     setMessage(error.message, 'error');
   }
 });
 
-googleOauthButton.addEventListener('click', () => {
-  window.location.href = `${API_BASE}?action=oauth.google.start`;
-});
+  googleOauthButton.addEventListener('click', () => {
+    window.location.href = `${API_BASE}?action=oauth.google.start`;
+  });
 
-handleOauthTokenFromHash();
-restoreSessionIfAny();
+  handleOauthTokenFromHash();
+  restoreSessionIfAny();
+  console.log('App initialized');
