@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Outil candidature - Inscription</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <section class="card auth-card">
+        <h1>Créer un compte</h1>
+        <p class="subtitle">Entrez votre e-mail, puis validez le code sur la page Home.</p>
+
+        <div class="social-stack" aria-label="Connexion avec un réseau social">
+          <button id="google-oauth-button" type="button" class="social-button social-google">
+            <span class="icon" aria-hidden="true">G</span>
+            Continuer avec Google
+          </button>
+        </div>
+
+        <form id="signup-form" novalidate>
+          <fieldset>
+            <legend>Inscription par e-mail</legend>
+
+            <label for="fullName">Nom complet</label>
+            <input id="fullName" name="fullName" type="text" placeholder="Votre nom complet" required />
+
+            <label for="email">E-mail</label>
+            <input id="email" name="email" type="email" placeholder="Votre adresse e-mail" required />
+          </fieldset>
+
+          <button type="submit" class="primary-cta">Envoyer un code de vérification</button>
+        </form>
+
+        <p class="switch-auth">Vous avez déjà un compte ? <a href="#" class="login-link">Se connecter</a></p>
+        <p id="message" class="message" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
