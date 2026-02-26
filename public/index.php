@@ -32,4 +32,4 @@ if ($requestPath !== '/' && file_exists(__DIR__ . $requestPath)) {
 }
 
 http_response_code(404);
-echo "Désolé, cette page n'existe pas.";
+include __DIR__ . '/../backend/View/404/index.html';
