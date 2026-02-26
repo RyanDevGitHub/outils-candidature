@@ -131,6 +131,48 @@ if ($action === 'auth.email.start' && $method === 'POST') {
     jsonResponse($payload);
 }
 
+
+if ($action === 'auth.email.login.start' && $method === 'POST') {
+    $body = jsonBody();
+    $email = trim((string) ($body['email'] ?? ''));
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        jsonResponse(['ok' => false, 'error' => 'Email invalide.'], 422);
+    }
+
+    $pdo = db();
+    $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email LIMIT 1');
+    $stmt->execute(['email' => mb_strtolower($email)]);
+    $user = $stmt->fetch();
+
+    if (!$user) {
+        jsonResponse(['ok' => false, 'error' => 'Aucun compte trouvé pour cet email.'], 404);
+    }
+
+    $code = randomCode(6);
+    $codeHash = hashValue($code);
+    $expiresAt = nowUtc()->modify('+10 minutes')->format('Y-m-d H:i:s');
+
+    $codeStmt = $pdo->prepare('INSERT INTO email_verification_codes (user_id, code_hash, expires_at) VALUES (:user_id, :code_hash, :expires_at)');
+    $codeStmt->execute([
+        'user_id' => $user['id'],
+        'code_hash' => $codeHash,
+        'expires_at' => $expiresAt,
+    ]);
+
+    $sent = sendVerificationEmail($email, $code);
+    if (!$sent && $config['app_env'] !== 'local') {
+        jsonResponse(['ok' => false, 'error' => 'Échec de l\'envoi de l\'email.'], 500);
+    }
+
+    $payload = ['ok' => true, 'message' => 'Code de vérification envoyé.'];
+    if ($config['app_env'] === 'local') {
+        $payload['debugCode'] = $code;
+    }
+
+    jsonResponse($payload);
+}
+
 if ($action === 'auth.email.verify' && $method === 'POST') {
     $body = jsonBody();
     $email = trim((string) ($body['email'] ?? ''));
