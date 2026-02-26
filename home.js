@@ -1,13 +1,6 @@
 const API_BASE = 'http://localhost:8000/api.php';
 const AUTH_TOKEN_KEY = 'authToken';
 
-const homeMessage = document.getElementById('home-message');
-const homeSubtitle = document.getElementById('home-subtitle');
-
-const verifyModal = document.getElementById('verify-modal');
-const verifyForm = document.getElementById('verify-form');
-const verificationCodeInput = document.getElementById('verificationCode');
-
 const modal = document.getElementById('profile-modal');
 const modalQuestion = document.getElementById('modal-question');
 const modalFieldContainer = document.getElementById('modal-field-container');
@@ -15,31 +8,43 @@ const progressText = document.getElementById('progress-text');
 const progressBar = document.getElementById('progress-bar');
 const backButton = document.getElementById('back-button');
 const nextButton = document.getElementById('next-button');
-
-const profilePreview = document.getElementById('profile-preview');
-const previewContent = document.getElementById('preview-content');
+const homeMessage = document.getElementById('home-message');
 
 const profileSteps = [
   { key: 'contractType', label: 'Quel type de contrat recherchez-vous ?', type: 'select', options: ['CDI', 'CDD', 'Stage', 'Alternance', 'Freelance'] },
-  { key: 'regions', label: 'Dans quelles régions souhaitez-vous travailler ? (séparez par des virgules)', type: 'text', placeholder: 'Île-de-France, Occitanie' },
+  { key: 'regions', label: 'Dans quelles régions souhaitez-vous travailler ? (séparez par des virgules)', type: 'autocomplete', placeholder: 'Île-de-France, Occitanie' },
   { key: 'educationLevel', label: "Quel est votre niveau d'étude ?", type: 'select', options: ['Bac', 'Bac+2', 'Bac+3', 'Bac+5', 'Doctorat'] },
-  { key: 'duration', label: 'Quelle durée souhaitez-vous ?', type: 'text', placeholder: 'Ex: 6 mois' },
+  { key: 'duration', label: 'Quelle durée souhaitez-vous ?', type: 'select', options: ['3 mois', '6 mois', '1 an', '18 mois', '2 ans', '3 ans'] },
   { key: 'experience', label: "Quel est votre niveau d'expérience ?", type: 'select', options: ['Junior (0-2 ans)', 'Confirmé (3-5 ans)', 'Senior (6+ ans)'] },
   { key: 'startDate', label: 'Quelle est votre date de début souhaitée ?', type: 'date' },
   { key: 'companyCategory', label: "Quelle catégorie d'entreprise vous intéresse ?", type: 'select', options: ['Startup', 'PME', 'Grande entreprise', 'Association', 'Public'] },
 ];
 
-let currentStep = 0;
+const REGION_SUGGESTIONS = ['Auvergne-Rhône-Alpes', 'Bourgogne-Franche-Comté', 'Bretagne', 'Centre-Val de Loire', 'Corse', 'Grand Est', 'Hauts-de-France', 'Île-de-France', 'Normandie', 'Nouvelle-Aquitaine', 'Occitanie', 'Pays de la Loire', 'Provence-Alpes-Côte d’Azur'];
+
 let accountData = null;
+let currentStep = 0;
 const profileAnswers = {};
+
+function parseRegions(value) {
+  return value.split(',').map((region) => region.trim()).filter(Boolean);
+}
 
 function setMessage(text, type = 'success') {
   homeMessage.textContent = text;
   homeMessage.className = `message ${type}`;
 }
 
-function parseRegions(value) {
-  return value.split(',').map((r) => r.trim()).filter(Boolean);
+function showPendingToastIfAny() {
+  const toast = sessionStorage.getItem('profileToast');
+  if (!toast) return;
+
+  setMessage(toast, 'success');
+  sessionStorage.removeItem('profileToast');
+}
+
+function getAuthToken() {
+  return localStorage.getItem(AUTH_TOKEN_KEY) || '';
 }
 
 async function apiRequest(action, payload) {
@@ -57,44 +62,11 @@ async function apiRequest(action, payload) {
   return data;
 }
 
-function saveAuthToken(token) {
-  localStorage.setItem(AUTH_TOKEN_KEY, token);
-}
-
-function getAuthToken() {
-  return localStorage.getItem(AUTH_TOKEN_KEY) || '';
-}
-
-function openVerifyModal() {
-  verifyModal.classList.remove('hidden');
-  verifyModal.setAttribute('aria-hidden', 'false');
-  verificationCodeInput.focus();
-}
-
-function closeVerifyModal() {
-  verifyModal.classList.add('hidden');
-  verifyModal.setAttribute('aria-hidden', 'true');
-}
-
-function renderPreview(payload) {
-  profilePreview.classList.remove('hidden');
-  previewContent.textContent = JSON.stringify(payload, null, 2);
-}
-
-function hydratePreviewFromStorage() {
-  const raw = localStorage.getItem('candidateProfile');
-  if (!raw) return;
-  try {
-    renderPreview(JSON.parse(raw));
-  } catch {
-    localStorage.removeItem('candidateProfile');
-  }
-}
-
 function getStepValue(step) {
   if (step.key === 'regions') {
     return Array.isArray(profileAnswers.regions) ? profileAnswers.regions.join(', ') : '';
   }
+
   return profileAnswers[step.key] || '';
 }
 
@@ -118,11 +90,61 @@ function renderStep() {
 
   progressText.textContent = `Finalisation du profil : ${progress}%`;
   progressBar.style.width = `${progress}%`;
+
   modalQuestion.textContent = step.label;
   modalFieldContainer.innerHTML = '';
 
   let input;
-  if (step.type === 'select') {
+  if (step.key === 'contractType') {
+    input = document.createElement('div');
+    input.className = 'contract-picker';
+    input.id = 'step-input';
+
+    step.options.forEach((optionValue) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'contract-option';
+      button.textContent = optionValue;
+      button.setAttribute('aria-pressed', String(getStepValue(step) === optionValue));
+
+      if (getStepValue(step) === optionValue) button.classList.add('selected');
+
+      button.addEventListener('click', () => {
+        profileAnswers.contractType = optionValue;
+        renderStep();
+      });
+
+      input.appendChild(button);
+    });
+  } else if (step.key === 'startDate') {
+    input = document.createElement('div');
+    input.id = 'step-input';
+    input.className = 'date-widget';
+
+    const dateInput = document.createElement('input');
+    dateInput.type = 'date';
+    dateInput.id = 'start-date-input';
+    dateInput.value = getStepValue(step);
+
+    const quickActions = document.createElement('div');
+    quickActions.className = 'date-quick-actions';
+
+    [{ label: "Aujourd'hui", days: 0 }, { label: 'Dans 2 semaines', days: 14 }, { label: 'Dans 1 mois', days: 30 }].forEach((option) => {
+      const quickButton = document.createElement('button');
+      quickButton.type = 'button';
+      quickButton.className = 'date-quick-button';
+      quickButton.textContent = option.label;
+      quickButton.addEventListener('click', () => {
+        const date = new Date();
+        date.setDate(date.getDate() + option.days);
+        dateInput.value = date.toISOString().split('T')[0];
+      });
+      quickActions.appendChild(quickButton);
+    });
+
+    input.appendChild(dateInput);
+    input.appendChild(quickActions);
+  } else if (step.type === 'select') {
     input = document.createElement('select');
     const placeholderOption = document.createElement('option');
     placeholderOption.value = '';
@@ -135,32 +157,32 @@ function renderStep() {
       option.textContent = optionValue;
       input.appendChild(option);
     });
+
+    input.id = 'step-input';
+    input.value = getStepValue(step);
   } else {
     input = document.createElement('input');
-    input.type = step.type;
+    input.type = 'text';
+    input.id = 'step-input';
+    input.value = getStepValue(step);
     if (step.placeholder) input.placeholder = step.placeholder;
+
+    if (step.key === 'regions') {
+      input.setAttribute('list', 'regions-suggestions');
+      const dataList = document.createElement('datalist');
+      dataList.id = 'regions-suggestions';
+      REGION_SUGGESTIONS.forEach((region) => {
+        const option = document.createElement('option');
+        option.value = region;
+        dataList.appendChild(option);
+      });
+      modalFieldContainer.appendChild(dataList);
+    }
   }
 
-  input.id = 'step-input';
-  input.value = getStepValue(step);
   modalFieldContainer.appendChild(input);
   backButton.disabled = currentStep === 0;
   nextButton.textContent = currentStep === profileSteps.length - 1 ? 'Terminer' : 'Suivant';
-}
-
-function openProfileModal() {
-  currentStep = 0;
-  profileSteps.forEach((step) => {
-    profileAnswers[step.key] = step.key === 'regions' ? [] : '';
-  });
-  modal.classList.remove('hidden');
-  modal.setAttribute('aria-hidden', 'false');
-  renderStep();
-}
-
-function closeProfileModal() {
-  modal.classList.add('hidden');
-  modal.setAttribute('aria-hidden', 'true');
 }
 
 function saveProfile() {
@@ -176,67 +198,27 @@ function saveProfile() {
       companyCategory: profileAnswers.companyCategory,
     },
   };
+
   localStorage.setItem('candidateProfile', JSON.stringify(payload));
-  return payload;
 }
 
 async function restoreSessionIfAny() {
   const token = getAuthToken();
-  if (!token) return false;
+  if (!token) {
+    window.location.href = 'index.html';
+    return;
+  }
 
   try {
     const data = await apiRequest('auth.session', { token });
     accountData = { fullName: data.user.fullName || '', email: data.user.email };
-    homeSubtitle.textContent = `Connecté en tant que ${data.user.email}`;
-    setMessage('Session active. Vous pouvez compléter votre profil.', 'success');
-    return true;
+    setMessage(`Bienvenue ${accountData.fullName || accountData.email}`);
+    renderStep();
   } catch {
     localStorage.removeItem(AUTH_TOKEN_KEY);
-    return false;
+    window.location.href = 'index.html';
   }
 }
-
-function handleOauthTokenFromHash() {
-  const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-  const authToken = params.get('authToken');
-  if (!authToken) return false;
-
-  saveAuthToken(authToken);
-  setMessage('Connexion Google réussie.', 'success');
-  history.replaceState(null, '', window.location.pathname + window.location.search);
-  return true;
-}
-
-function getQueryParams() {
-  const query = new URLSearchParams(window.location.search);
-  return {
-    fullName: query.get('fullName') || '',
-    email: query.get('email') || '',
-    debugCode: query.get('debugCode') || '',
-  };
-}
-
-verifyForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
-
-  if (!verifyForm.checkValidity()) {
-    verifyForm.reportValidity();
-    setMessage('Code de vérification invalide.', 'error');
-    return;
-  }
-
-  const code = verificationCodeInput.value.trim();
-
-  try {
-    const data = await apiRequest('auth.email.verify', { email: accountData.email, code });
-    saveAuthToken(data.token);
-    closeVerifyModal();
-    setMessage('E-mail vérifié. Connexion réussie.', 'success');
-    openProfileModal();
-  } catch (error) {
-    setMessage(error.message, 'error');
-  }
-});
 
 backButton.addEventListener('click', () => {
   if (currentStep === 0) return;
@@ -248,9 +230,14 @@ nextButton.addEventListener('click', () => {
   const step = profileSteps[currentStep];
   const input = document.getElementById('step-input');
 
-  if (!setStepValue(step, input.value)) {
+  const rawValue = (() => {
+    if (step.key === 'contractType') return profileAnswers.contractType || '';
+    if (step.key === 'startDate') return document.getElementById('start-date-input')?.value || '';
+    return input ? input.value : '';
+  })();
+
+  if (!setStepValue(step, rawValue)) {
     setMessage('Merci de répondre à la question avant de continuer.', 'error');
-    input.focus();
     return;
   }
 
@@ -260,33 +247,11 @@ nextButton.addEventListener('click', () => {
     return;
   }
 
-  progressText.textContent = 'Finalisation du profil : 100%';
-  progressBar.style.width = '100%';
-  const payload = saveProfile();
-  renderPreview(payload);
-  closeProfileModal();
-  setMessage('Profil complété avec succès.', 'success');
+  saveProfile();
+  sessionStorage.setItem('profileToast', 'Profil complété avec succès. Vos préférences ont été enregistrées.');
+  modal.classList.add('hidden');
+  showPendingToastIfAny();
 });
 
-(async function initHome() {
-  const fromOauth = handleOauthTokenFromHash();
-  const hasSession = await restoreSessionIfAny();
-  const { fullName, email, debugCode } = getQueryParams();
-
-  if (!hasSession && email) {
-    accountData = { fullName, email };
-    homeSubtitle.textContent = `Code envoyé à ${email}.`;
-    setMessage(
-      debugCode
-        ? `Code envoyé. (dev: ${debugCode})`
-        : 'Un code de vérification a été envoyé par e-mail.',
-      'success'
-    );
-    openVerifyModal();
-  } else if (hasSession || fromOauth) {
-    setMessage('Vous êtes connecté. Complétez votre profil.', 'success');
-    openProfileModal();
-  }
-
-  hydratePreviewFromStorage();
-})();
+restoreSessionIfAny();
+showPendingToastIfAny();

@@ -1,43 +1,61 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Outil candidature - Inscription</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <main class="container">
-      <section class="card auth-card">
-        <h1>Créer un compte</h1>
-        <p class="subtitle">Entrez votre e-mail, puis validez le code sur la page Home.</p>
 
-        <div class="social-stack" aria-label="Connexion avec un réseau social">
-          <button id="google-oauth-button" type="button" class="social-button social-google">
-            <span class="icon" aria-hidden="true">G</span>
-            Continuer avec Google
-          </button>
-        </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Outil candidature - Création de compte</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
 
-        <form id="signup-form" novalidate>
-          <fieldset>
-            <legend>Inscription par e-mail</legend>
+<body>
+  <main class="container">
+    <section class="card auth-card">
+      <h1>Créer un compte</h1>
+      <p class="subtitle">Authentification passwordless par e-mail (code) ou OAuth Google.</p>
 
-            <label for="fullName">Nom complet</label>
-            <input id="fullName" name="fullName" type="text" placeholder="Votre nom complet" required />
+      <div class="social-stack" aria-label="Connexion avec un réseau social">
+        <button id="google-oauth-button" type="button" class="social-button social-google">
+          <span class="icon" aria-hidden="true">G</span>
+          Continuer avec Google
+        </button>
+      </div>
 
-            <label for="email">E-mail</label>
-            <input id="email" name="email" type="email" placeholder="Votre adresse e-mail" required />
-          </fieldset>
+      <form id="signup-form" novalidate>
+        <fieldset>
+          <legend>Inscription par e-mail</legend>
 
-          <button type="submit" class="primary-cta">Envoyer un code de vérification</button>
-        </form>
+          <label for="fullName">Nom complet</label>
+          <input id="fullName" name="fullName" type="text" placeholder="Votre nom complet" required />
 
-        <p class="switch-auth">Vous avez déjà un compte ? <a href="#" class="login-link">Se connecter</a></p>
-        <p id="message" class="message" aria-live="polite"></p>
-      </section>
-    </main>
+          <label for="email">E-mail</label>
+          <input id="email" name="email" type="email" placeholder="Votre adresse e-mail" required />
+        </fieldset>
 
-    <script src="app.js"></script>
-  </body>
+        <button type="submit" class="primary-cta">Envoyer un code de vérification</button>
+      </form>
+
+      <form id="verify-form" class="hidden" novalidate>
+        <fieldset>
+          <legend>Vérifier votre e-mail</legend>
+          <label for="verificationCode">Code reçu par e-mail</label>
+          <input id="verificationCode" name="verificationCode" type="text" minlength="6" maxlength="6"
+            placeholder="Ex: 123456" required />
+        </fieldset>
+
+        <button type="submit" class="primary-cta">Valider le code</button>
+      </form>
+
+      <p class="switch-auth">
+        Vous avez déjà un compte ? <a href="#" class="login-link">Se connecter</a>
+      </p>
+
+      <p id="message" class="message" aria-live="polite"></p>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+
 </html>

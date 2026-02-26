@@ -4,6 +4,9 @@ const signupForm = document.getElementById('signup-form');
 const googleOauthButton = document.getElementById('google-oauth-button');
 const message = document.getElementById('message');
 
+let accountData = null;
+let pendingEmail = '';
+
 function setMessage(text, type = 'success') {
   message.textContent = text;
   message.className = `message ${type}`;
@@ -22,6 +25,39 @@ async function apiRequest(action, payload) {
   }
 
   return data;
+}
+
+function saveAuthToken(token) {
+  localStorage.setItem(AUTH_TOKEN_KEY, token);
+}
+
+function getAuthToken() {
+  return localStorage.getItem(AUTH_TOKEN_KEY) || '';
+}
+
+async function restoreSessionIfAny() {
+  const token = getAuthToken();
+  if (!token) return;
+
+  try {
+    const data = await apiRequest('auth.session', { token });
+    accountData = { fullName: data.user.fullName || '', email: data.user.email };
+    setMessage(`Session active: ${data.user.email}`, 'success');
+  } catch {
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+  }
+}
+
+function handleOauthTokenFromHash() {
+  const hash = window.location.hash.replace(/^#/, '');
+  const params = new URLSearchParams(hash);
+  const authToken = params.get('authToken');
+  if (!authToken) return;
+
+  saveAuthToken(authToken);
+  setMessage('Connexion Google réussie. Redirection vers la suite de l’inscription.', 'success');
+  history.replaceState(null, '', window.location.pathname);
+  window.location.href = 'home.html';
 }
 
 signupForm.addEventListener('submit', async (event) => {
@@ -43,7 +79,14 @@ signupForm.addEventListener('submit', async (event) => {
       params.set('debugCode', data.debugCode);
     }
 
-    window.location.href = `/home.html?${params.toString()}`;
+  try {
+    const data = await apiRequest('auth.email.verify', { email: pendingEmail, code });
+    saveAuthToken(data.token);
+    accountData = { fullName: data.user.fullName || '', email: data.user.email };
+    verifyForm.reset();
+    verifyForm.classList.add('hidden');
+    setMessage('E-mail vérifié. Redirection vers la suite.', 'success');
+    window.location.href = 'home.html';
   } catch (error) {
     setMessage(error.message, 'error');
   }
@@ -52,3 +95,6 @@ signupForm.addEventListener('submit', async (event) => {
 googleOauthButton.addEventListener('click', () => {
   window.location.href = `${API_BASE}?action=oauth.google.start`;
 });
+
+handleOauthTokenFromHash();
+restoreSessionIfAny();

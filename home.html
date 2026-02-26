@@ -1,59 +1,44 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Outil candidature - Home</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <main class="container">
-      <section class="card auth-card">
-        <h1>Home</h1>
-        <p id="home-subtitle" class="subtitle">Finalisez votre connexion et complétez votre profil.</p>
-        <p id="home-message" class="message" aria-live="polite"></p>
-      </section>
 
-      <section id="profile-preview" class="card preview hidden" aria-live="polite">
-        <h2>Résultat possible : aperçu du profil enregistré</h2>
-        <p class="subtitle">Voici ce qui est sauvegardé une fois le profil complété.</p>
-        <pre id="preview-content" class="preview-content"></pre>
-      </section>
-    </main>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Outil candidature - Home</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
 
-    <section id="verify-modal" class="modal hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="verify-title">
-      <div class="modal-card">
-        <h2 id="verify-title">Vérifier votre e-mail</h2>
-        <p class="subtitle">Saisissez le code reçu par e-mail pour continuer.</p>
-        <form id="verify-form" novalidate>
-          <label for="verificationCode">Code de vérification</label>
-          <input id="verificationCode" name="verificationCode" type="text" minlength="6" maxlength="6" placeholder="Ex: 123456" required />
-          <button type="submit">Valider le code</button>
-        </form>
-      </div>
+<body>
+  <main class="container">
+    <section class="card auth-card home-card">
+      <h1>Home</h1>
+      <p class="subtitle">Continuez votre inscription en complétant votre profil.</p>
+      <p id="home-message" class="message" aria-live="polite"></p>
     </section>
+  </main>
 
-    <section id="profile-modal" class="modal hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-      <div class="modal-card">
-        <div class="progress-header">
-          <p id="progress-text" class="progress-text">Finalisation du profil : 0%</p>
-          <div class="progress-track" aria-hidden="true">
-            <div id="progress-bar" class="progress-bar"></div>
-          </div>
-        </div>
-
-        <h2 id="modal-title">Compléter votre profil</h2>
-        <p id="modal-question" class="modal-question"></p>
-
-        <div id="modal-field-container" class="modal-field-container"></div>
-
-        <div class="modal-actions">
-          <button id="back-button" type="button" class="secondary">Retour</button>
-          <button id="next-button" type="button">Suivant</button>
+  <section id="profile-modal" class="modal" aria-hidden="false" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card">
+      <div class="progress-header">
+        <p id="progress-text" class="progress-text">Finalisation du profil : 0%</p>
+        <div class="progress-track" aria-hidden="true">
+          <div id="progress-bar" class="progress-bar"></div>
         </div>
       </div>
-    </section>
 
-    <script src="home.js"></script>
-  </body>
+      <h2 id="modal-title">Compléter votre profil</h2>
+      <p id="modal-question" class="modal-question"></p>
+
+      <div id="modal-field-container" class="modal-field-container"></div>
+
+      <div class="modal-actions">
+        <button id="back-button" type="button" class="secondary">Retour</button>
+        <button id="next-button" type="button">Suivant</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="home.js"></script>
+</body>
+
 </html>
