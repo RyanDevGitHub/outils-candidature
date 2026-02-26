@@ -1,5 +1,4 @@
 const API_BASE = 'http://localhost:8000/api.php';
-const AUTH_TOKEN_KEY = 'authToken';
 
 const loginForm = document.getElementById('login-form');
 const verifyForm = document.getElementById('verify-form');
@@ -28,12 +27,18 @@ async function apiRequest(action, payload) {
   return data;
 }
 
-function saveAuthToken(token) {
-  localStorage.setItem(AUTH_TOKEN_KEY, token);
+function getCookie(name) {
+  const escapedName = name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+  const match = document.cookie.match(new RegExp(`(?:^|; )${escapedName}=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : '';
+}
+
+function deleteCookie(name) {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax`;
 }
 
 function getAuthToken() {
-  return localStorage.getItem(AUTH_TOKEN_KEY) || '';
+  return getCookie('authToken');
 }
 
 async function restoreSessionIfAny() {
@@ -42,21 +47,10 @@ async function restoreSessionIfAny() {
 
   try {
     await apiRequest('auth.session', { token });
-    window.location.href = 'home.html';
+    window.location.href = '/home';
   } catch {
-    localStorage.removeItem(AUTH_TOKEN_KEY);
+    deleteCookie('authToken');
   }
-}
-
-function handleOauthTokenFromHash() {
-  const hash = window.location.hash.replace(/^#/, '');
-  const params = new URLSearchParams(hash);
-  const authToken = params.get('authToken');
-  if (!authToken) return;
-
-  saveAuthToken(authToken);
-  setMessage('Connexion Google réussie. Redirection…', 'success');
-  window.location.href = 'home.html';
 }
 
 loginForm.addEventListener('submit', async (event) => {
@@ -94,13 +88,12 @@ verifyForm.addEventListener('submit', async (event) => {
   const code = verifyForm.verificationCode.value.trim();
 
   try {
-    const data = await apiRequest('auth.email.verify', {
+    await apiRequest('auth.email.verify', {
       email: pendingEmail,
       code,
     });
 
-    saveAuthToken(data.token);
-    window.location.href = 'home.html';
+    window.location.href = '/home';
   } catch (error) {
     setMessage(error.message, 'error');
   }
@@ -110,5 +103,4 @@ googleOauthButton.addEventListener('click', () => {
   window.location.href = `${API_BASE}?action=oauth.google.start`;
 });
 
-handleOauthTokenFromHash();
 restoreSessionIfAny();
