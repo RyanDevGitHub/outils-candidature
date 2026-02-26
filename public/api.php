@@ -95,6 +95,55 @@ function currentUserByToken(string $plainToken): ?array
     return $row ?: null;
 }
 
+function saveUserProfile(int $userId, array $profile): void
+{
+    $regions = json_encode($profile['regions'] ?? [], JSON_UNESCAPED_UNICODE);
+
+    db()->prepare(
+        'UPDATE users
+         SET profile_contract_type = :contract_type,
+             profile_regions = :regions,
+             profile_education_level = :education_level,
+             profile_duration = :duration,
+             profile_experience = :experience,
+             profile_start_date = :start_date,
+             profile_company_category = :company_category,
+             updated_at = datetime("now")
+         WHERE id = :id'
+    )->execute([
+        'contract_type' => trim((string) ($profile['contractType'] ?? '')),
+        'regions' => $regions === false ? '[]' : $regions,
+        'education_level' => trim((string) ($profile['educationLevel'] ?? '')),
+        'duration' => trim((string) ($profile['duration'] ?? '')),
+        'experience' => trim((string) ($profile['experience'] ?? '')),
+        'start_date' => trim((string) ($profile['startDate'] ?? '')),
+        'company_category' => trim((string) ($profile['companyCategory'] ?? '')),
+        'id' => $userId,
+    ]);
+}
+
+function hasCompletedProfile(array $user): bool
+{
+    $requiredFields = [
+        'profile_contract_type',
+        'profile_regions',
+        'profile_education_level',
+        'profile_duration',
+        'profile_experience',
+        'profile_start_date',
+        'profile_company_category',
+    ];
+
+    foreach ($requiredFields as $field) {
+        $value = trim((string) ($user[$field] ?? ''));
+        if ($value === '' || $value === '[]') {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 if ($action === 'auth.email.start' && $method === 'POST') {
     $body = jsonBody();
     $fullName = trim((string) ($body['fullName'] ?? ''));
@@ -222,8 +271,35 @@ if ($action === 'auth.email.verify' && $method === 'POST') {
             'fullName' => $user['full_name'],
             'email' => $user['email'],
             'provider' => $user['auth_provider'],
+            'hasCompletedProfile' => hasCompletedProfile($user),
         ],
     ]);
+}
+
+
+if ($action === 'auth.profile.save' && $method === 'POST') {
+    $body = jsonBody();
+    $token = trim((string) ($body['token'] ?? ''));
+    $profile = $body['profile'] ?? null;
+
+    if ($token === '' || !is_array($profile)) {
+        jsonResponse(['ok' => false, 'error' => 'Données manquantes.'], 422);
+    }
+
+    $required = ['contractType', 'regions', 'educationLevel', 'duration', 'experience', 'startDate', 'companyCategory'];
+    foreach ($required as $field) {
+        if (!array_key_exists($field, $profile)) {
+            jsonResponse(['ok' => false, 'error' => 'Profil incomplet.'], 422);
+        }
+    }
+
+    $user = currentUserByToken($token);
+    if (!$user) {
+        jsonResponse(['ok' => false, 'error' => 'Session invalide.'], 401);
+    }
+
+    saveUserProfile((int) $user['id'], $profile);
+    jsonResponse(['ok' => true]);
 }
 
 if ($action === 'auth.session' && $method === 'POST') {
@@ -246,6 +322,7 @@ if ($action === 'auth.session' && $method === 'POST') {
             'fullName' => $user['full_name'],
             'email' => $user['email'],
             'provider' => $user['auth_provider'],
+            'hasCompletedProfile' => hasCompletedProfile($user),
         ],
     ]);
 }

@@ -295,3 +295,23 @@ button:hover {
   cursor: not-allowed;
   opacity: 0.55;
 }
+
+
+.region-select {
+  min-height: 220px;
+  border-radius: 12px;
+  border: 1px solid #3a3a3a;
+  background: linear-gradient(180deg, #151515 0%, #0f0f0f 100%);
+  padding: 0.45rem;
+}
+
+.region-select option {
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  margin: 0.1rem 0;
+}
+
+.region-select option:checked {
+  background: #facc15;
+  color: #111827;
+}
