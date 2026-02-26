@@ -1,0 +1,318 @@
+Array
+(
+    [date] => 2026-02-26 00:34:52
+    [action] => auth.email.start
+    [method] => OPTIONS
+    [get] => Array
+        (
+            [action] => auth.email.start
+        )
+
+    [post] => Array
+        (
+        )
+
+    [body] => 
+)
+Array
+(
+    [date] => 2026-02-26 00:37:34
+    [action] => auth.email.start
+    [method] => POST
+    [get] => Array
+        (
+            [action] => auth.email.start
+        )
+
+    [post] => Array
+        (
+        )
+
+    [body] => Array
+        (
+            [email] => ryanhaddadpro@gmail.com
+        )
+
+)
+Array
+(
+    [date] => 2026-02-26 00:38:51
+    [action] => auth.email.start
+    [method] => POST
+    [get] => Array
+        (
+            [action] => auth.email.start
+        )
+
+    [post] => Array
+        (
+        )
+
+    [body] => Array
+        (
+            [email] => ryanhaddadpro@gmail.com
+        )
+
+)
+Array
+(
+    [date] => 2026-02-26 00:39:52
+    [action] => auth.email.start
+    [method] => POST
+    [get] => Array
+        (
+            [action] => auth.email.start
+        )
+
+    [post] => Array
+        (
+        )
+
+    [body] => Array
+        (
+            [email] => ryanhaddadpro@gmail.com
+        )
+
+)
+Array
+(
+    [date] => 2026-02-26 00:39:58
+    [action] => auth.email.start
+    [method] => POST
+    [get] => Array
+        (
+            [action] => auth.email.start
+        )
+
+    [post] => Array
+        (
+        )
+
+    [body] => Array
+        (
+            [email] => ryanhaddadpro@gmail.com
+        )
+
+)
+Array
+(
+    [date] => 2026-02-26 00:40:42
+    [action] => auth.email.start
+    [method] => POST
+    [get] => Array
+        (
+            [action] => auth.email.start
+        )
+
+    [post] => Array
+        (
+        )
+
+    [body] => Array
+        (
+            [email] => ryanhaddadpro@gmail.com
+        )
+
+)
+Array
+(
+    [date] => 2026-02-26 00:40:44
+    [action] => auth.email.start
+    [method] => POST
+    [get] => Array
+        (
+            [action] => auth.email.start
+        )
+
+    [post] => Array
+        (
+        )
+
+    [body] => Array
+        (
+            [email] => ryanhaddadpro@gmail.com
+        )
+
+)
+Array
+(
+    [date] => 2026-02-26 00:40:46
+    [action] => auth.email.start
+    [method] => POST
+    [get] => Array
+        (
+            [action] => auth.email.start
+        )
+
+    [post] => Array
+        (
+        )
+
+    [body] => Array
+        (
+            [email] => ryanhaddadpro@gmail.com
+        )
+
+)
+Array
+(
+    [date] => 2026-02-26 00:40:50
+    [action] => auth.email.start
+    [method] => POST
+    [get] => Array
+        (
+            [action] => auth.email.start
+        )
+
+    [post] => Array
+        (
+        )
+
+    [body] => Array
+        (
+            [email] => ryanhaddadpro@gmail.com
+        )
+
+)
+Array
+(
+    [date] => 2026-02-26 00:40:52
+    [action] => auth.email.start
+    [method] => POST
+    [get] => Array
+        (
+            [action] => auth.email.start
+        )
+
+    [post] => Array
+        (
+        )
+
+    [body] => Array
+        (
+            [email] => ryanhaddadpro@gmail.com
+        )
+
+)
+Array
+(
+    [date] => 2026-02-26 00:40:52
+    [action] => auth.email.start
+    [method] => POST
+    [get] => Array
+        (
+            [action] => auth.email.start
+        )
+
+    [post] => Array
+        (
+        )
+
+    [body] => Array
+        (
+            [email] => ryanhaddadpro@gmail.com
+        )
+
+)
+Array
+(
+    [date] => 2026-02-26 00:40:56
+    [action] => auth.email.start
+    [method] => POST
+    [get] => Array
+        (
+            [action] => auth.email.start
+        )
+
+    [post] => Array
+        (
+        )
+
+    [body] => Array
+        (
+            [email] => ryanhaddadpro@gmail.com
+        )
+
+)
+Array
+(
+    [date] => 2026-02-26 00:42:13
+    [action] => auth.email.start
+    [method] => POST
+    [get] => Array
+        (
+            [action] => auth.email.start
+        )
+
+    [post] => Array
+        (
+        )
+
+    [body] => Array
+        (
+            [email] => ryanhaddadpro@gmail.com
+        )
+
+)
+Array
+(
+    [date] => 2026-02-26 00:42:19
+    [action] => auth.email.start
+    [method] => POST
+    [get] => Array
+        (
+            [action] => auth.email.start
+        )
+
+    [post] => Array
+        (
+        )
+
+    [body] => Array
+        (
+            [email] => ryanhaddadpro@gmail.com
+        )
+
+)
+Array
+(
+    [date] => 2026-02-26 00:50:07
+    [action] => auth.email.start
+    [method] => POST
+    [get] => Array
+        (
+            [action] => auth.email.start
+        )
+
+    [post] => Array
+        (
+        )
+
+    [body] => Array
+        (
+            [fullName] => Ryan Haddad
+            [email] => ryanhaddadpro@gmail.com
+        )
+
+)
+Array
+(
+    [date] => 2026-02-26 00:52:15
+    [action] => auth.email.verify
+    [method] => POST
+    [get] => Array
+        (
+            [action] => auth.email.verify
+        )
+
+    [post] => Array
+        (
+        )
+
+    [body] => Array
+        (
+            [email] => ryanhaddadpro@gmail.com
+            [code] => 932240
+        )
+
+)
