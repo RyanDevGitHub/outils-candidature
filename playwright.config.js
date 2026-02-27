@@ -7,17 +7,14 @@ module.exports = defineConfig({
   fullyParallel: false,
   reporter: [['list']],
   use: {
-    baseURL: 'http://127.0.0.1:4173',
+    // Plus besoin de "/view", on est à la racine
+    baseURL: 'http://localhost:4173',
     trace: 'on-first-retry',
   },
   webServer: {
-    /**
-     * Ici, on lance deux serveurs simples :
-     * 1. PHP pour ton API (port 4173)
-     * 2. Un serveur statique pour tes fichiers HTML/JS (port 4173)
-     */
-    command: "php scripts/init_db.php && npx concurrently \"php -d xdebug.mode=off -S 127.0.0.1:4173 -t public\" \"npx http-server . -p 4173 -a 127.0.0.1\"",
-    url: 'http://127.0.0.1:4173/index.html',
+    command: "php scripts/init_db.php && php -d xdebug.mode=off -S localhost:4173 -t public",
+    // Surveille la racine '/' au lieu d'un fichier .html inexistant
+    url: 'http://localhost:4173', 
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },

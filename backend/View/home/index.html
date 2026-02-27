@@ -15,8 +15,9 @@
         <div class="sidebar-brand-dot" aria-hidden="true"></div>
         <h1>Candidature</h1>
       </div>
-
+      <p id="home-message" class="message" aria-live="polite"></p>  
       <p class="sidebar-kicker">Menu</p>
+
       <nav>
         <ul class="sidebar-nav">
           <li><a href="#" class="is-active" data-dashboard-target="offres-du-jour">Offres du jour</a></li>
@@ -28,7 +29,7 @@
     </aside>
 
     <section class="dashboard-content" aria-label="Contenu du dashboard">
-      <header class="dashboard-topbar card">
+      <!-- <header class="dashboard-topbar card">
         <label class="dashboard-search" for="dashboard-search-input">
           <span aria-hidden="true">🔎</span>
           <input id="dashboard-search-input" type="text" placeholder="Rechercher une section..." />
@@ -37,15 +38,16 @@
           <button type="button">Nouvelle candidature</button>
           <button type="button" class="secondary">Importer des données</button>
         </div>
-      </header>
+      </header> -->
 
-      <section class="dashboard-welcome card">
+      <!-- <section class="dashboard-welcome card">
         <h2>Dashboard</h2>
         <p class="subtitle">Planifiez, suivez et centralisez vos candidatures.</p>
-        <p id="home-message" class="message" aria-live="polite"></p>
-      </section>
 
-      <section id="kpi-dashboard" class="card dashboard-section dashboard-panel" data-dashboard-panel="kpi-dashboard" aria-labelledby="kpi-title" hidden>
+      </section> -->
+
+      <section id="kpi-dashboard" class="card dashboard-section dashboard-panel" data-dashboard-panel="kpi-dashboard"
+        aria-labelledby="kpi-title" hidden>
         <div class="section-header">
           <h2 id="kpi-title">Dashboard KPI</h2>
           <p class="subtitle">Vue synthétique jour / semaine / mois.</p>
@@ -75,7 +77,8 @@
         <div class="dashboard-placeholder"></div>
       </section>
 
-      <section id="offres-du-jour" class="card dashboard-section dashboard-panel" data-dashboard-panel="offres-du-jour" aria-labelledby="offres-title">
+      <section id="offres-du-jour" class="card dashboard-section dashboard-panel" data-dashboard-panel="offres-du-jour"
+        aria-labelledby="offres-title">
         <div class="section-header">
           <h2 id="offres-title">Offres du jour</h2>
           <p class="subtitle">Sélection personnalisée des offres pertinentes.</p>
@@ -84,7 +87,8 @@
         <div class="dashboard-placeholder"></div>
       </section>
 
-      <section id="suivi-candidatures" class="card dashboard-section dashboard-panel" data-dashboard-panel="suivi-candidatures" aria-labelledby="suivi-title" hidden>
+      <section id="suivi-candidatures" class="card dashboard-section dashboard-panel"
+        data-dashboard-panel="suivi-candidatures" aria-labelledby="suivi-title" hidden>
         <div class="section-header">
           <h2 id="suivi-title">Suivi des candidatures</h2>
           <p class="subtitle">Envoyées, relances, sans réponse depuis 7 jours.</p>
@@ -94,7 +98,8 @@
         <div class="dashboard-placeholder"></div>
       </section>
 
-      <section id="profil-utilisateur" class="card dashboard-section dashboard-panel" data-dashboard-panel="profil-utilisateur" aria-labelledby="profil-title" hidden>
+      <section id="profil-utilisateur" class="card dashboard-section dashboard-panel"
+        data-dashboard-panel="profil-utilisateur" aria-labelledby="profil-title" hidden>
         <div class="section-header">
           <h2 id="profil-title">Profil utilisateur</h2>
           <p class="subtitle">Informations personnelles et préférences.</p>
@@ -106,7 +111,8 @@
     </section>
   </main>
 
-  <section id="profile-modal" class="modal hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <section id="profile-modal" class="modal hidden" aria-hidden="true" role="dialog" aria-modal="true"
+    aria-labelledby="modal-title">
     <div class="modal-card">
       <div class="progress-header">
         <p id="progress-text" class="progress-text">Finalisation du profil : 0%</p>
