@@ -415,6 +415,8 @@ button:hover {
   display: grid;
   gap: 1rem;
   min-width: 0;
+  display: flex;
+  justify-content: center;
 }
 
 .dashboard-home .dashboard-content {
@@ -422,6 +424,7 @@ button:hover {
 }
 
 .dashboard-section {
+  width: -webkit-fill-available;
   display: grid;
   gap: 0.8rem;
 }
@@ -657,13 +660,11 @@ button:hover {
 
 .dashboard-home .dashboard-placeholder {
   min-height: 120px;
-  background: repeating-linear-gradient(
-      -45deg,
+  background: repeating-linear-gradient(-45deg,
       rgba(250, 204, 21, 0.08),
       rgba(250, 204, 21, 0.08) 10px,
       rgba(255, 255, 255, 0.03) 10px,
-      rgba(255, 255, 255, 0.03) 20px
-    ),
+      rgba(255, 255, 255, 0.03) 20px),
     #0f0f0f;
   border: 1px dashed #3a3a3a;
 }
@@ -718,7 +719,7 @@ button:hover {
     gap: 1.1rem;
   }
 
-  .dashboard-home .dashboard-content > .dashboard-panel {
+  .dashboard-home .dashboard-content>.dashboard-panel {
     margin: 0;
     max-width: none;
     min-height: 100%;
