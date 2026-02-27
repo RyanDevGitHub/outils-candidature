@@ -1,6 +1,4 @@
 const API_BASE = 'http://localhost:4173/api.php';
-const AUTH_TOKEN_KEY = 'authToken';
-
 // Sélection des éléments
 const signupForm = document.getElementById('signup-form');
 const loginForm = document.getElementById('login-form');
@@ -24,6 +22,10 @@ function getCookie(name) {
 
 function deleteCookie(name) {
     document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax`;
+}
+
+function getAuthToken() {
+    return getCookie('auth_token') || getCookie('authToken');
 }
 
 function setMessage(text, type = 'success') {
@@ -56,7 +58,7 @@ async function apiRequest(action, payload) {
  * Vérification de la session au chargement
  */
 async function restoreSessionIfAny() {
-    const token = getCookie('authToken');
+    const token = getAuthToken();
     if (!token) return;
 
     try {
@@ -65,6 +67,7 @@ async function restoreSessionIfAny() {
         window.location.href = '/home';
     } catch (error) {
         console.error("Session invalide détectée :", error);
+        deleteCookie('auth_token');
         deleteCookie('authToken');
     }
 }

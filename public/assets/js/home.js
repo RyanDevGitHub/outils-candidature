@@ -55,7 +55,7 @@ function deleteCookie(name) {
 }
 
 function getAuthToken() {
-  return getCookie('authToken');
+  return getCookie('auth_token') || getCookie('authToken');
 }
 
 async function apiRequest(action, payload) {
@@ -243,11 +243,21 @@ async function restoreSessionIfAny() {
     renderStep();
   } catch (error) {
     console.error('Error restoring session:', error);
+    deleteCookie('auth_token');
     deleteCookie('authToken');
     window.location.href = '/';
   }
 }
 
+
+
+function toggleHomeLinkVisibility() {
+  const homeLinkItem = document.querySelector('[data-auth-home-link]');
+  if (!homeLinkItem) return;
+
+  const token = getAuthToken();
+  homeLinkItem.hidden = token === '';
+}
 
 function initializeDashboardNavigation() {
   const navLinks = Array.from(document.querySelectorAll('[data-dashboard-target]'));
@@ -317,6 +327,7 @@ nextButton.addEventListener('click', () => {
       setMessage(error.message, 'error');
     });
 });
+toggleHomeLinkVisibility();
 initializeDashboardNavigation();
 restoreSessionIfAny();
 showPendingToastIfAny();

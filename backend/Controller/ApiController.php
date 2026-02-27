@@ -132,6 +132,7 @@ function handleApiRequest(string $action, string $method, array $config): void
 
         $token = createAuthToken((int) $user['id']);
 
+        setcookie('auth_token', $token, $authCookieOptions);
         setcookie('authToken', $token, $authCookieOptions);
 
         apiOk([
@@ -350,6 +351,7 @@ function handleApiRequest(string $action, string $method, array $config): void
 
         $token = createAuthToken((int) $user['id']);
 
+        setcookie('auth_token', $token, $authCookieOptions);
         setcookie('authToken', $token, $authCookieOptions);
         apiRedirect('/home');
     }
