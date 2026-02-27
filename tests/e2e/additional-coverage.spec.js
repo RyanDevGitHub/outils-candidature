@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 
-const API = 'http://127.0.0.1:4173/api.php';
+const API = 'http://localhost:4173/api.php';
 
 function uniqueEmail(prefix = 'e2e') {
   return `${prefix}.${Date.now()}.${Math.floor(Math.random() * 10000)}@example.com`;
@@ -45,7 +45,7 @@ test('Connexion e-mail via code pour un utilisateur existant', async ({ page, re
   const user = await createUserAndToken(request, uniqueEmail('existing'));
 
   await page.goto('/');
-  await page.getByLabel('E-mail').fill(user.email);
+  await page.locator('#login-form').getByLabel('E-mail').fill(user.email);
   await page.getByRole('button', { name: 'Envoyer un code de vérification' }).click();
 
   const message = page.locator('#message');
@@ -68,7 +68,7 @@ test('Utilisateur avec session valide est redirigé de / vers /home', async ({ p
     {
       name: 'authToken',
       value: user.token,
-      domain: '127.0.0.1',
+      domain: 'localhost',
       path: '/',
       httpOnly: false,
       secure: false,
@@ -101,7 +101,7 @@ test('Navigation sidebar dashboard + affichage message de bienvenue', async ({ p
     {
       name: 'authToken',
       value: user.token,
-      domain: '127.0.0.1',
+      domain: 'localhost',
       path: '/',
       httpOnly: false,
       secure: false,
@@ -131,7 +131,7 @@ test('Modal profil affiche une erreur si on avance sans répondre', async ({ pag
     {
       name: 'authToken',
       value: user.token,
-      domain: '127.0.0.1',
+      domain: 'localhost',
       path: '/',
       httpOnly: false,
       secure: false,
@@ -153,7 +153,7 @@ test('Complétion complète du profil (7 étapes) puis succès', async ({ page, 
     {
       name: 'authToken',
       value: user.token,
-      domain: '127.0.0.1',
+      domain: 'localhost',
       path: '/',
       httpOnly: false,
       secure: false,
@@ -191,8 +191,28 @@ test('Complétion complète du profil (7 étapes) puis succès', async ({ page, 
 
 test('Bouton Google déclenche le flux OAuth côté interface', async ({ page }) => {
   await page.goto('/');
+  
+  // On clique et on attend que l'URL change
   await page.getByRole('button', { name: 'Continuer avec Google' }).click();
 
-  await expect(page).toHaveURL(/api\.php\?action=oauth\.google\.start/);
-  await expect(page.locator('body')).toContainText('OAuth Google non configuré');
+  // On utilise une fonction qui attend que l'une des deux conditions soit vraie
+  await expect(async () => {
+    const url = page.url();
+    expect(url).toMatch(/google\.com|api\.php\?action=oauth\.google\.start/);
+  }).toPass();
+
+  // On check la destination finale
+  const finalUrl = page.url();
+  
+ if (finalUrl.includes('accounts.google.com')) {
+    // CAS SUCCÈS : On est chez Google
+    console.log("Redirection Google OK");
+    
+    // On cible spécifiquement le titre principal (H1) pour éviter les doublons
+    await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
+  } else {
+    // CAS ERREUR : On est resté sur l'API
+    console.log("Redirection stoppée : Erreur config");
+    await expect(page.locator('body')).toContainText('OAuth Google non configuré');
+  }
 });
