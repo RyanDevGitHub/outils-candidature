@@ -21,6 +21,8 @@ body {
   place-items: center;
   gap: 1rem;
   padding: 1rem;
+  width: min(100%, 1600px);
+  margin: 0 auto;
 }
 
 .card {
@@ -30,6 +32,10 @@ body {
   border-radius: 14px;
   box-shadow: 0 12px 34px rgba(0, 0, 0, 0.45);
   padding: 1rem;
+}
+
+.section-header {
+  max-width: 70ch;
 }
 
 .auth-card {
@@ -411,6 +417,10 @@ button:hover {
   min-width: 0;
 }
 
+.dashboard-home .dashboard-content {
+  align-content: start;
+}
+
 .dashboard-section {
   display: grid;
   gap: 0.8rem;
@@ -447,6 +457,10 @@ button:hover {
 
   .sidebar-nav a {
     display: block;
+  }
+
+  .dashboard-home .dashboard-section {
+    max-width: 95ch;
   }
 }
 
@@ -682,5 +696,111 @@ button:hover {
 
   .dashboard-home .kpi-grid {
     grid-template-columns: repeat(3, minmax(160px, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    width: min(100%, 1680px);
+    padding-inline: 1.5rem;
+  }
+
+  .dashboard-home .dashboard-layout {
+    grid-template-columns: 260px minmax(0, 1fr);
+    width: min(1460px, calc(100% - 3rem));
+    padding: 1.25rem;
+    gap: 1.25rem;
+  }
+
+  .dashboard-home .dashboard-content {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: minmax(220px, auto);
+    gap: 1.1rem;
+  }
+
+  .dashboard-home .dashboard-content > .dashboard-panel {
+    margin: 0;
+    max-width: none;
+    min-height: 100%;
+  }
+
+  .dashboard-home #offres-du-jour {
+    grid-column: 1 / -1;
+  }
+
+  .dashboard-home .kpi-grid {
+    grid-template-columns: repeat(4, minmax(150px, 1fr));
+  }
+}
+
+@media (min-width: 1536px) {
+  .dashboard-home .dashboard-layout {
+    width: min(1700px, calc(100% - 4rem));
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .dashboard-home .dashboard-content {
+    grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+
+  .dashboard-home #offres-du-jour {
+    grid-column: 1;
+  }
+
+  .dashboard-home #kpi-dashboard {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+
+  .dashboard-home .kpi-grid {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+  }
+
+  .dashboard-home .section-header {
+    max-width: 65ch;
+  }
+}
+
+@media (min-width: 1920px) {
+  .container {
+    width: min(100%, 1840px);
+  }
+
+  .dashboard-home .dashboard-layout {
+    width: min(1860px, calc(100% - 5rem));
+    grid-template-columns: 320px minmax(0, 1fr);
+    gap: 1.75rem;
+    padding: 1.75rem;
+  }
+
+  .dashboard-home .dashboard-content {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: minmax(240px, auto);
+  }
+
+  .dashboard-home #offres-du-jour {
+    grid-column: span 2;
+  }
+
+  .dashboard-home #kpi-dashboard {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .dashboard-home #suivi-candidatures,
+  .dashboard-home #profil-utilisateur {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .dashboard-home .kpi-grid {
+    grid-template-columns: repeat(3, minmax(130px, 1fr));
+  }
+
+  .dashboard-home .dashboard-panel {
+    min-height: 360px;
   }
 }
