@@ -8,12 +8,101 @@
   <link rel="stylesheet" href="/assets/css/styles.css" />
 </head>
 
-<body>
-  <main class="container">
-    <section class="card auth-card home-card">
-      <h1>Home</h1>
-      <p class="subtitle">Continuez votre inscription en complétant votre profil.</p>
-      <p id="home-message" class="message" aria-live="polite"></p>
+<body class="dashboard-home">
+  <main class="dashboard-layout">
+    <aside class="dashboard-sidebar" aria-label="Navigation principale du dashboard">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-dot" aria-hidden="true"></div>
+        <h1>Candidature</h1>
+      </div>
+
+      <p class="sidebar-kicker">Menu</p>
+      <nav>
+        <ul class="sidebar-nav">
+          <li><a href="#" class="is-active" data-dashboard-target="offres-du-jour">Offres du jour</a></li>
+          <li><a href="#" data-dashboard-target="kpi-dashboard">Dashboard KPI</a></li>
+          <li><a href="#" data-dashboard-target="suivi-candidatures">Suivi candidatures</a></li>
+          <li><a href="#" data-dashboard-target="profil-utilisateur">Profil utilisateur</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <section class="dashboard-content" aria-label="Contenu du dashboard">
+      <header class="dashboard-topbar card">
+        <label class="dashboard-search" for="dashboard-search-input">
+          <span aria-hidden="true">🔎</span>
+          <input id="dashboard-search-input" type="text" placeholder="Rechercher une section..." />
+        </label>
+        <div class="dashboard-topbar-actions">
+          <button type="button">Nouvelle candidature</button>
+          <button type="button" class="secondary">Importer des données</button>
+        </div>
+      </header>
+
+      <section class="dashboard-welcome card">
+        <h2>Dashboard</h2>
+        <p class="subtitle">Planifiez, suivez et centralisez vos candidatures.</p>
+        <p id="home-message" class="message" aria-live="polite"></p>
+      </section>
+
+      <section id="kpi-dashboard" class="card dashboard-section dashboard-panel" data-dashboard-panel="kpi-dashboard" aria-labelledby="kpi-title" hidden>
+        <div class="section-header">
+          <h2 id="kpi-title">Dashboard KPI</h2>
+          <p class="subtitle">Vue synthétique jour / semaine / mois.</p>
+        </div>
+
+        <div class="kpi-grid">
+          <article class="kpi-card kpi-highlight">
+            <p class="kpi-label">Offres disponibles</p>
+            <p class="kpi-value">--</p>
+            <p class="kpi-meta">Filtre: jour / semaine / mois</p>
+          </article>
+          <article class="kpi-card">
+            <p class="kpi-label">Candidatures envoyées</p>
+            <p class="kpi-value">--</p>
+            <p class="kpi-meta">Période active</p>
+          </article>
+          <article class="kpi-card">
+            <p class="kpi-label">Compétences les plus demandées</p>
+            <p class="kpi-value">--</p>
+            <p class="kpi-meta">Top compétences</p>
+          </article>
+        </div>
+
+        <!-- TODO : calculer le nombre d'offres depuis la base -->
+        <!-- TODO : calculer le nombre de candidatures envoyées depuis la base -->
+        <!-- TODO : récupérer les compétences les plus demandées -->
+        <div class="dashboard-placeholder"></div>
+      </section>
+
+      <section id="offres-du-jour" class="card dashboard-section dashboard-panel" data-dashboard-panel="offres-du-jour" aria-labelledby="offres-title">
+        <div class="section-header">
+          <h2 id="offres-title">Offres du jour</h2>
+          <p class="subtitle">Sélection personnalisée des offres pertinentes.</p>
+        </div>
+        <!-- TODO : récupérer les offres depuis la base de données pour l'utilisateur -->
+        <div class="dashboard-placeholder"></div>
+      </section>
+
+      <section id="suivi-candidatures" class="card dashboard-section dashboard-panel" data-dashboard-panel="suivi-candidatures" aria-labelledby="suivi-title" hidden>
+        <div class="section-header">
+          <h2 id="suivi-title">Suivi des candidatures</h2>
+          <p class="subtitle">Envoyées, relances, sans réponse depuis 7 jours.</p>
+        </div>
+        <!-- TODO : récupérer les candidatures envoyées depuis la base -->
+        <!-- TODO : calculer les offres sans réponse depuis 7 jours -->
+        <div class="dashboard-placeholder"></div>
+      </section>
+
+      <section id="profil-utilisateur" class="card dashboard-section dashboard-panel" data-dashboard-panel="profil-utilisateur" aria-labelledby="profil-title" hidden>
+        <div class="section-header">
+          <h2 id="profil-title">Profil utilisateur</h2>
+          <p class="subtitle">Informations personnelles et préférences.</p>
+        </div>
+        <!-- TODO : récupérer les données du profil depuis la base -->
+        <!-- TODO : permettre mise à jour des préférences -->
+        <div class="dashboard-placeholder"></div>
+      </section>
     </section>
   </main>
 
