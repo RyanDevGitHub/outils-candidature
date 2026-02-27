@@ -248,6 +248,37 @@ async function restoreSessionIfAny() {
   }
 }
 
+
+function initializeDashboardNavigation() {
+  const navLinks = Array.from(document.querySelectorAll('[data-dashboard-target]'));
+  const panels = Array.from(document.querySelectorAll('[data-dashboard-panel]'));
+
+  if (!navLinks.length || !panels.length) return;
+
+  const showPanel = (target) => {
+    panels.forEach((panel) => {
+      const isCurrent = panel.dataset.dashboardPanel === target;
+      panel.hidden = !isCurrent;
+    });
+
+    navLinks.forEach((link) => {
+      const isCurrent = link.dataset.dashboardTarget === target;
+      link.classList.toggle('is-active', isCurrent);
+      link.setAttribute('aria-current', isCurrent ? 'page' : 'false');
+    });
+  };
+
+  navLinks.forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      showPanel(link.dataset.dashboardTarget);
+    });
+  });
+
+  const firstTarget = navLinks.find((link) => link.classList.contains('is-active'))?.dataset.dashboardTarget || navLinks[0].dataset.dashboardTarget;
+  showPanel(firstTarget);
+}
+
 backButton.addEventListener('click', () => {
   if (currentStep === 0) return;
   currentStep -= 1;
@@ -286,5 +317,6 @@ nextButton.addEventListener('click', () => {
       setMessage(error.message, 'error');
     });
 });
+initializeDashboardNavigation();
 restoreSessionIfAny();
 showPendingToastIfAny();
